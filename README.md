@@ -82,6 +82,20 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 ### 10 — Features Analíticas
 | Item | Status | Observação |
 |---|---|---|
-| 10.01 Indicadores de produtos | **Concluído** | `src/features/produtos.py` (`add_indicadores_produtos`): `INDICE_DIVERSIFICACAO` (proporção de produtos possuídos sobre o total possível) e `NIVEL_DIVERSIFICACAO` (categórico ordenado Baixa/Média/Alta, faixas em `FAIXAS_DIVERSIFICACAO`, `src/config/settings.py`), calculados sobre `QTD_PRODUTOS` já existente na Silver. Testado em `tests/test_features.py`. Demais indicadores da fase (associados, movimentação, classificação) ainda pendentes. |
+| 10.01 Indicadores de produtos | **Concluído** | `src/features/produtos.py` (`add_indicadores_produtos`): `INDICE_DIVERSIFICACAO` (proporção de produtos possuídos sobre o total possível) e `NIVEL_DIVERSIFICACAO` (categórico ordenado Baixa/Média/Alta, faixas em `FAIXAS_DIVERSIFICACAO`, `src/config/settings.py`), calculados sobre `QTD_PRODUTOS` já existente na Silver. Testado em `tests/test_features.py`. |
+| 10.02 Tempo de relacionamento | **Concluído** | `src/features/associados.py` (`add_indicadores_relacionamento`): `TEMPO_RELACIONAMENTO_DIAS` e `TEMPO_RELACIONAMENTO_ANOS` (`dias / DIAS_POR_ANO`) a partir de `DATA_REFERENCIA − DATA_ASSOCIACAO`. Ver decisão sobre datas futuras abaixo. Testado em `tests/test_features.py`. Demais indicadores da fase (movimentação, classificação, oportunidades) ainda pendentes. |
+
+#### Tratamento de datas futuras em TEMPO_RELACIONAMENTO
+
+37 registros da base têm `DATA_ASSOCIACAO` futura em relação à data de execução do pipeline (ver `docs/qualidade_dados.md`) — um problema de qualidade da fonte, não um valor de negócio válido. Alternativas avaliadas para o cálculo de `TEMPO_RELACIONAMENTO_DIAS`/`TEMPO_RELACIONAMENTO_ANOS`:
+
+| Abordagem | Por que foi descartada |
+|---|---|
+| Zerar/clipar em 0 | Insere um valor factualmente falso (associado não entrou "hoje"); distorce médias e classificações por tempo para baixo. |
+| Excluir o associado da base de features | Quebra a integridade 1:1:1 entre Associados/Produtos/Movimentacao (`test_chaves_identicas_entre_entidades`) e o remove de indicadores que não dependem de tempo. |
+| Imputar com média/mediana | Cria dado sintético para mascarar um problema de qualidade, em vez de sinalizá-lo — contraria a estratégia definida no item 01.04. |
+| **Nulo (NaN), preservando o registro** *(adotada)* | Não fabrica valor, mantém o associado íntegro na base e o problema visível/auditável. |
+
+Solução adotada: a camada Silver (`src/cleaning/associados.py`) sinaliza a inconsistência em `DATA_ASSOCIACAO_INVALIDA`, sem alterar `DATA_ASSOCIACAO` na origem. A camada Features usa essa flag para mascarar `TEMPO_RELACIONAMENTO_DIAS`/`TEMPO_RELACIONAMENTO_ANOS` como nulos apenas nesses 37 registros, mantendo a decisão já formalizada em `docs/regras_negocio.md` (seção 2) — o registro segue disponível para as demais análises, mas nulo para tempo de relacionamento, e cabe à Classificação (fase futura) tratá-lo com a flag `CLASSIFICACAO_TEMPO_INDISPONIVEL`.
 
 
