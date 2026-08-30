@@ -54,6 +54,12 @@ FAIXAS_RENDA = (
     ("Acima de R$ 15.000", 15_000, None),
 )
 
+FAIXAS_DIVERSIFICACAO = (
+    ("Baixa", 0, 1),
+    ("Média", 2, 4),
+    ("Alta", 5, len(PRODUCT_COLUMNS)),
+)
+
 TERCIS_MOVIMENTACAO = {
     "SALDO_MEDIO": (78_900, 163_530),
     "PIX_MENSAL": (32, 66),
