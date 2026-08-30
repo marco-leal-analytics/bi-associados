@@ -50,6 +50,17 @@ def flag_future_dates(series, reference_date=None, invalid_value=pd.NaT):
     return treated, is_future
 
 
+def flag_out_of_range(series, min_value=None, max_value=None, invalid_value=None):
+    invalid_value = float("nan") if invalid_value is None else invalid_value
+    is_invalid = pd.Series(False, index=series.index)
+    if min_value is not None:
+        is_invalid |= series < min_value
+    if max_value is not None:
+        is_invalid |= series > max_value
+    treated = series.where(~is_invalid, invalid_value)
+    return treated, is_invalid
+
+
 def count_duplicates(df, subset=None):
     return int(df.duplicated(subset=subset).sum())
 
