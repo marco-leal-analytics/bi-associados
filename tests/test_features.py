@@ -1,8 +1,12 @@
 import pandas as pd
 import pytest
 
-from src.config.settings import DIAS_POR_ANO, PRODUCT_COLUMNS
-from src.features.associados import add_indicadores_relacionamento
+from src.config.settings import DIAS_POR_ANO, FAIXAS_RENDA, PRODUCT_COLUMNS
+from src.features.associados import (
+    FAIXA_RENDA_NAO_INFORMADO,
+    add_faixa_renda,
+    add_indicadores_relacionamento,
+)
 from src.features.produtos import TOTAL_PRODUTOS_POSSIVEIS, add_indicadores_produtos
 from src.pipeline import SILVER_ASSOCIADOS_PATH, SILVER_PRODUTOS_PATH
 
@@ -17,6 +21,12 @@ def produtos_features():
 def associados_features():
     df = pd.read_parquet(SILVER_ASSOCIADOS_PATH)
     return add_indicadores_relacionamento(df)
+
+
+@pytest.fixture(scope="module")
+def associados_faixa_renda():
+    df = pd.read_parquet(SILVER_ASSOCIADOS_PATH)
+    return add_faixa_renda(df)
 
 
 def test_indice_diversificacao_dominio(produtos_features):
@@ -63,3 +73,27 @@ def test_tempo_relacionamento_anos_consistente_com_dias(associados_features):
     dias = associados_features.loc[validos, "TEMPO_RELACIONAMENTO_DIAS"].astype("float64")
     anos_esperado = (dias / DIAS_POR_ANO).round(2)
     assert (associados_features.loc[validos, "TEMPO_RELACIONAMENTO_ANOS"] == anos_esperado).all()
+
+
+# --- Faixa de renda ---
+
+
+def test_faixa_renda_categorias(associados_faixa_renda):
+    esperado = {nome for nome, _, _ in FAIXAS_RENDA} | {FAIXA_RENDA_NAO_INFORMADO}
+    assert set(associados_faixa_renda["FAIXA_RENDA"].dropna().unique()) == esperado
+
+
+def test_faixa_renda_nao_informado_em_renda_nula(associados_faixa_renda):
+    nula = associados_faixa_renda["RENDA_MENSAL"].isna()
+    assert (associados_faixa_renda.loc[nula, "FAIXA_RENDA"] == FAIXA_RENDA_NAO_INFORMADO).all()
+    assert (associados_faixa_renda.loc[~nula, "FAIXA_RENDA"] != FAIXA_RENDA_NAO_INFORMADO).all()
+
+
+def test_faixa_renda_limites_consistentes(associados_faixa_renda):
+    limite_anterior = 0
+    for nome, _, maximo in FAIXAS_RENDA:
+        renda = associados_faixa_renda.loc[associados_faixa_renda["FAIXA_RENDA"] == nome, "RENDA_MENSAL"]
+        assert (renda > limite_anterior).all()
+        if maximo is not None:
+            assert (renda <= maximo).all()
+            limite_anterior = maximo

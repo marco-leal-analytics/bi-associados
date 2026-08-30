@@ -83,7 +83,8 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 | Item | Status | Observação |
 |---|---|---|
 | 10.01 Indicadores de produtos | **Concluído** | `src/features/produtos.py` (`add_indicadores_produtos`): `INDICE_DIVERSIFICACAO` (proporção de produtos possuídos sobre o total possível) e `NIVEL_DIVERSIFICACAO` (categórico ordenado Baixa/Média/Alta, faixas em `FAIXAS_DIVERSIFICACAO`, `src/config/settings.py`), calculados sobre `QTD_PRODUTOS` já existente na Silver. Testado em `tests/test_features.py`. |
-| 10.02 Tempo de relacionamento | **Concluído** | `src/features/associados.py` (`add_indicadores_relacionamento`): `TEMPO_RELACIONAMENTO_DIAS` e `TEMPO_RELACIONAMENTO_ANOS` (`dias / DIAS_POR_ANO`) a partir de `DATA_REFERENCIA − DATA_ASSOCIACAO`. Ver decisão sobre datas futuras abaixo. Testado em `tests/test_features.py`. Demais indicadores da fase (movimentação, classificação, oportunidades) ainda pendentes. |
+| 10.02 Tempo de relacionamento | **Concluído** | `src/features/associados.py` (`add_indicadores_relacionamento`): `TEMPO_RELACIONAMENTO_DIAS` e `TEMPO_RELACIONAMENTO_ANOS` (`dias / DIAS_POR_ANO`) a partir de `DATA_REFERENCIA − DATA_ASSOCIACAO`. Ver decisão sobre datas futuras abaixo. Testado em `tests/test_features.py`. |
+| 10.03 Faixas de renda | **Concluído** | `src/features/associados.py` (`add_faixa_renda`): categoriza `RENDA_MENSAL` em `FAIXA_RENDA` (Até R$3.000 / R$3.001–8.000 / R$8.001–15.000 / Acima de R$15.000), faixas definidas em `FAIXAS_RENDA` (`src/config/settings.py`). Os 12 registros com `RENDA_MENSAL` nula recebem a categoria `"Não informado"`, conforme `docs/regras_negocio.md` (seção 3), em vez de serem excluídos ou imputados. Testado em `tests/test_features.py`. Demais indicadores da fase (movimentação, classificação, oportunidades) ainda pendentes. |
 
 #### Tratamento de datas futuras em TEMPO_RELACIONAMENTO
 
