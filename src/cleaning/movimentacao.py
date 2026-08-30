@@ -1,13 +1,8 @@
 from src.cleaning.common import assert_allowed_nulls, flag_out_of_range, handle_duplicate_keys
-from src.config.settings import KEY_COLUMN, RAW_ASSOCIADOS_PATH, SHEET_MOVIMENTACAO
-from src.io.excel import read_sheet
+from src.config.settings import KEY_COLUMN
 
 NUMERIC_COLUMNS = ("SALDO_MEDIO", "PIX_MENSAL", "COMPRAS_CARTAO")
 COLUNAS_COM_NULO_PERMITIDO = NUMERIC_COLUMNS
-
-
-def read_movimentacao(file_path=RAW_ASSOCIADOS_PATH):
-    return read_sheet(file_path, SHEET_MOVIMENTACAO)
 
 
 def clean_movimentacao(df):

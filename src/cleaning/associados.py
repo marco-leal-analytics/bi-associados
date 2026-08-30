@@ -8,8 +8,7 @@ from src.cleaning.common import (
     normalize_categories,
     standardize_text,
 )
-from src.config.settings import KEY_COLUMN, RAW_ASSOCIADOS_PATH, SHEET_ASSOCIADOS
-from src.io.excel import read_sheet
+from src.config.settings import KEY_COLUMN
 
 CIDADE_CANONICAL_MAP = {
     "P. Branco": "Pato Branco",
@@ -24,10 +23,6 @@ SILVER_DTYPES_ASSOCIADOS = {
     "AGENCIA": "int64",
     "RENDA_MENSAL": "float64",
 }
-
-
-def read_associados(file_path=RAW_ASSOCIADOS_PATH):
-    return read_sheet(file_path, SHEET_ASSOCIADOS)
 
 
 def clean_associados(df, reference_date=None):

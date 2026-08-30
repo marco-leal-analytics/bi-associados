@@ -40,9 +40,9 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 | Item | Status | Observação |
 |---|---|---|
 | 05.01 Criar leitor Excel | **Concluído** | `src/io/excel.py`: `read_sheet` e `load_sources`, funções genéricas e reutilizáveis. |
-| 05.02 Implementar leitura de Associados | **Parcial** | `read_associados()` existe e usa `read_sheet`, mas está definida em `src/cleaning/associados.py` e não em `src/io` — diverge da separação "io = leitura exclusiva" prevista no cronograma. |
-| 05.03 Implementar leitura de Produtos | **Parcial** | Mesma situação: `read_produtos()` está em `src/cleaning/produtos.py`. |
-| 05.04 Implementar leitura de Movimentacao | **Parcial** | Mesma situação: `read_movimentacao()` está em `src/cleaning/movimentacao.py`. |
+| 05.02 Implementar leitura de Associados | **Concluído** | Lida via `load_sources()` (`src/io/excel.py`), chamada por `run_ingestion()` (`src/pipeline.py`) — os `read_*` antes duplicados em `src/cleaning/*.py` foram removidos; leitura agora exclusiva de `src/io`. |
+| 05.03 Implementar leitura de Produtos | **Concluído** | Mesma leitura genérica via `load_sources()`, chave `SHEET_PRODUTOS`. |
+| 05.04 Implementar leitura de Movimentacao | **Concluído** | Mesma leitura genérica via `load_sources()`, chave `SHEET_MOVIMENTACAO`. |
 
 ### 06 — Configurações Centrais
 | Item | Status | Observação |
@@ -74,9 +74,9 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 ### 09 — Construção da Silver
 | Item | Status | Observação |
 |---|---|---|
-| 09.01 Gerar Associados | **Concluído** | `data/1_silver/associados.parquet`, gerado por `build_silver_associados` (`src/pipeline.py`). |
-| 09.02 Gerar Produtos | **Concluído** | `data/1_silver/produtos.parquet`, gerado por `build_silver_produtos`. |
-| 09.03 Gerar Movimentacao | **Concluído** | `data/1_silver/movimentacao.parquet`, gerado por `build_silver_movimentacao`. |
+| 09.01 Gerar Associados | **Concluído** | `data/1_silver/associados.parquet`, gerado por `run_silver()` (`src/pipeline.py`), que aplica `clean_associados`. |
+| 09.02 Gerar Produtos | **Concluído** | `data/1_silver/produtos.parquet`, gerado por `run_silver()`, que aplica `clean_produtos`. |
+| 09.03 Gerar Movimentacao | **Concluído** | `data/1_silver/movimentacao.parquet`, gerado por `run_silver()`, que aplica `clean_movimentacao`. |
 | 09.04 Validar Silver | **Concluído** | `tests/test_silver.py`: unicidade de chave, domínios, tipos, nulos residuais e integridade referencial entre as três entidades (1 a 1000 registros cada). |
 
 ### 10 — Features Analíticas
@@ -85,7 +85,7 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 | 10.01 Indicadores de produtos | **Concluído** | `src/features/produtos.py` (`add_indicadores_produtos`): `INDICE_DIVERSIFICACAO` (proporção de produtos possuídos sobre o total possível) e `NIVEL_DIVERSIFICACAO` (categórico ordenado, rótulos `"0 - Baixa"` / `"1 - Média"` / `"2 - Alta"` — prefixo numérico para ordenação correta no Power BI —, faixas em `FAIXAS_DIVERSIFICACAO`, `src/config/settings.py`), calculados sobre `QTD_PRODUTOS` já existente na Silver. Testado em `tests/test_features.py` (rótulos derivados de `FAIXAS_DIVERSIFICACAO`, não fixos no teste). |
 | 10.02 Tempo de relacionamento | **Concluído** | `src/features/associados.py` (`add_indicadores_relacionamento`): `TEMPO_RELACIONAMENTO_DIAS` e `TEMPO_RELACIONAMENTO_ANOS` (`dias / DIAS_POR_ANO`) a partir de `DATA_REFERENCIA − DATA_ASSOCIACAO`. Ver decisão sobre datas futuras abaixo. Testado em `tests/test_features.py`. |
 | 10.03 Faixas de renda | **Concluído** | `src/features/associados.py` (`add_faixa_renda`): categoriza `RENDA_MENSAL` em `FAIXA_RENDA`, rótulos `"A - Até R$ 3.000"` / `"B - R$ 3.001 a R$ 8.000"` / `"C - R$ 8.001 a R$ 15.000"` / `"D - Acima de R$ 15.000"` (prefixo alfabético para ordenação no Power BI), faixas definidas em `FAIXAS_RENDA` (`src/config/settings.py`). Os 12 registros com `RENDA_MENSAL` nula recebem a categoria `"Não informado"`, conforme `docs/regras_negocio.md` (seção 3), em vez de serem excluídos ou imputados. Testado em `tests/test_features.py`. |
-| 10.04 Consolidar features | **Concluído** | `src/features/consolidado.py` (`build_features`): aplica os indicadores de produtos e relacionamento sobre as respectivas entidades e faz `merge` por `CHAVE` das três bases Silver (`associados` ⋈ `produtos` ⋈ `movimentacao`), com `validate="one_to_one"` em cada junção para impor a cardinalidade 1:1:1 definida em `docs/dicionario_dados.md` — qualquer duplicidade futura em uma das entidades interrompe o pipeline em vez de inflar a base silenciosamente. Orquestrado em `src/pipeline.py` (`build_gold_features`), persistido em `data/2_gold/features.parquet`. Testado em `tests/test_features.py`. |
+| 10.04 Consolidar features | **Concluído** | `src/features/consolidado.py` (`build_features`): aplica os indicadores de produtos e relacionamento sobre as respectivas entidades e faz `merge` por `CHAVE` das três bases Silver (`associados` ⋈ `produtos` ⋈ `movimentacao`), com `validate="one_to_one"` em cada junção para impor a cardinalidade 1:1:1 definida em `docs/dicionario_dados.md` — qualquer duplicidade futura em uma das entidades interrompe o pipeline em vez de inflar a base silenciosamente. Orquestrado em `src/pipeline.py` (`run_gold`), persistido em `data/2_gold/features.parquet`. Testado em `tests/test_features.py`. |
 
 #### Tratamento de datas futuras em TEMPO_RELACIONAMENTO
 
@@ -110,6 +110,13 @@ Solução adotada: a camada Silver (`src/cleaning/associados.py`) sinaliza a inc
 |---|---|---|
 | 12.01 Consolidar entidades pela CHAVE | **Concluído** | `src/features/consolidado.py` (`build_features`): junção de Associados, Produtos e Movimentacao por `CHAVE` com `validate="one_to_one"`, respeitando a cardinalidade 1:1:1 documentada em `docs/dicionario_dados.md` (ver 10.04). |
 | 12.02 Adicionar features e classificação | **Concluído** | Além de `CLASSIFICACAO` (11.01), a Gold recebe `NIVEL_MOVIMENTACAO` (`src/features/movimentacao.py`, `add_nivel_movimentacao`): `SALDO_MEDIO`, `PIX_MENSAL` e `COMPRAS_CARTAO` classificados por tercis próprios (`TERCIS_MOVIMENTACAO`) em Baixa/Média/Alta, combinados pela moda entre os três, com desempate por `SALDO_MEDIO` em caso de empate triplo — conforme `docs/regras_negocio.md` (seção 4). E as três `FLAG_OPORTUNIDADE_*` (`src/features/oportunidades.py`, `add_flags_oportunidade`): alta renda com poucos produtos, baixa utilização e potencial de crescimento, parametrizadas em `OPORTUNIDADE_*` (`src/config/settings.py`) — ver `docs/regras_negocio.md` (seção 6). Testado em `tests/test_features.py`. |
+
+### 13 — Pipeline Principal
+| Item | Status | Observação |
+|---|---|---|
+| 13.01 Orquestrar ingestão | **Concluído** | `src/pipeline.py` (`run_ingestion`): lê as três planilhas Bronze via `load_sources()` (`src/io/excel.py`), sem transformação — apenas orquestra o módulo de leitura. Os `read_*` até então duplicados em `src/cleaning/*.py` foram removidos (ver 05.02–05.04). |
+| 13.02 Orquestrar Silver | **Concluído** | `src/pipeline.py` (`run_silver`): chama `clean_associados`/`clean_produtos`/`clean_movimentacao` (`src/cleaning/*.py`), cada um já validando o domínio/tipos antes e depois da limpeza (`assert_exact_categories`, `assert_allowed_nulls`, `handle_duplicate_keys` em `src/cleaning/common.py`) e levantando `ValueError` em caso de violação, e persiste os três parquets em `data/1_silver/`. `pipeline.py` não contém regra de limpeza própria, apenas orquestra. |
+| 13.03 Orquestrar Gold | **Concluído** | `src/pipeline.py` (`run_gold`): chama `build_features()` (`src/features/consolidado.py`), que consolida as entidades pela `CHAVE` (validando a cardinalidade 1:1:1), adiciona os indicadores analíticos e a classificação (12.01–12.02), e persiste `data/2_gold/features.parquet`. `run_pipeline()` encadeia as três etapas (ingestão → Silver → Gold) e é o único ponto de entrada do `python -m src.pipeline`. |
 
 ## Como executar
 

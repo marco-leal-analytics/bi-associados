@@ -1,12 +1,7 @@
 from src.cleaning.common import assert_allowed_nulls, convert_sn_to_bool, handle_duplicate_keys, validate_domain
-from src.config.settings import KEY_COLUMN, PRODUCT_COLUMNS, RAW_ASSOCIADOS_PATH, SHEET_PRODUTOS
-from src.io.excel import read_sheet
+from src.config.settings import KEY_COLUMN, PRODUCT_COLUMNS
 
 COLUNAS_COM_NULO_PERMITIDO = ()
-
-
-def read_produtos(file_path=RAW_ASSOCIADOS_PATH):
-    return read_sheet(file_path, SHEET_PRODUTOS)
 
 
 def clean_produtos(df):
