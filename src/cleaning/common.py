@@ -65,6 +65,39 @@ def count_duplicates(df, subset=None):
     return int(df.duplicated(subset=subset).sum())
 
 
+def handle_duplicate_keys(df, key_column):
+    full_row_duplicates = int(df.duplicated().sum())
+    df = df.drop_duplicates()
+
+    key_duplicates = df[df.duplicated(subset=[key_column], keep=False)]
+    if not key_duplicates.empty:
+        raise ValueError(
+            f"Duplicidade de {key_column} com dados divergentes (granularidade "
+            f"inesperada, não pode ser resolvida automaticamente): "
+            f"{sorted(key_duplicates[key_column].unique().tolist())}"
+        )
+
+    return df, full_row_duplicates
+
+
+def assert_allowed_nulls(df, allowed_columns):
+    allowed_columns = set(allowed_columns)
+    columns_with_nulls = set(df.columns[df.isna().any()])
+    unexpected = columns_with_nulls - allowed_columns
+    if unexpected:
+        raise ValueError(f"Nulos não previstos nas colunas: {sorted(unexpected)}")
+
+
+def assert_exact_categories(series, expected_categories):
+    observed = set(series.dropna().unique())
+    expected = set(expected_categories)
+    if observed != expected:
+        raise ValueError(
+            f"Categorias divergentes do esperado. Observadas: {sorted(observed)}; "
+            f"esperadas: {sorted(expected)}"
+        )
+
+
 def cast_types(df, dtype_map):
     return df.astype(dtype_map)
 
