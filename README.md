@@ -100,6 +100,11 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 
 Solução adotada: a camada Silver (`src/cleaning/associados.py`) sinaliza a inconsistência em `DATA_ASSOCIACAO_INVALIDA`, sem alterar `DATA_ASSOCIACAO` na origem. A camada Features usa essa flag para mascarar `TEMPO_RELACIONAMENTO_DIAS`/`TEMPO_RELACIONAMENTO_ANOS` como nulos apenas nesses 37 registros, mantendo a decisão já formalizada em `docs/regras_negocio.md` (seção 2) — o registro segue disponível para as demais análises, mas nulo para tempo de relacionamento, e cabe à Classificação (fase futura) tratá-lo com a flag `CLASSIFICACAO_TEMPO_INDISPONIVEL`.
 
+### 11 — Classificação dos Associados
+| Item | Status | Observação |
+|---|---|---|
+| 11.01 Definir metodologia | **Concluído** | `src/features/classificacao.py` (`add_classificacao`): índice composto por percentil (`INDICE_CLASSIFICACAO`), combinando as quatro dimensões pedidas — Produtos (`SCORE_PRODUTOS`), Relacionamento (`SCORE_RELACIONAMENTO`), Saldo (`SCORE_SALDO`) e Utilização (`SCORE_UTILIZACAO`) —, cortado em quartis para gerar `CLASSIFICACAO` (`Inicial`/`Em Desenvolvimento`/`Maduro`/`Engajado`). Substitui as regras sequenciais de exemplo do desafio, que produziam 83,1% dos associados em uma única categoria de fallback; a nova metodologia produz quatro grupos de tamanho comparável (250/250/250/250) com progressão monotônica nos indicadores brutos. Comparação com árvore de decisão e clustering (K-Means), e justificativa completa, em `docs/regras_negocio.md` (seção 5). Testado em `tests/test_features.py`. |
+
 ## Como executar
 
 ```

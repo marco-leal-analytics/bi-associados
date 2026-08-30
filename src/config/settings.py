@@ -66,23 +66,13 @@ TERCIS_MOVIMENTACAO = {
     "COMPRAS_CARTAO": (6_745, 13_131),
 }
 
-CLASSIFICACAO_ENGAJADO = {
-    "qtd_produtos_min": 5,
-    "tempo_anos_min": 3,
-    "nivel_movimentacao": {"Alta"},
-}
-CLASSIFICACAO_MADURO = {
-    "qtd_produtos_min": 4,
-    "tempo_anos_min": 3,
-    "nivel_movimentacao": {"Média", "Alta"},
-}
-CLASSIFICACAO_EM_DESENVOLVIMENTO = {
-    "qtd_produtos": {2, 3},
-    "tempo_anos_min": 2,
-}
-CLASSIFICACAO_INICIAL = {
-    "qtd_produtos_max": 1,
-    "tempo_anos_max": 2,
+CLASSIFICACAO_LABELS = ("Inicial", "Em Desenvolvimento", "Maduro", "Engajado")
+
+CLASSIFICACAO_PESOS = {
+    "produtos": 0.25,
+    "relacionamento": 0.25,
+    "saldo": 0.25,
+    "utilizacao": 0.25,
 }
 
 OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS = {

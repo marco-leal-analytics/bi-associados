@@ -1,7 +1,13 @@
 import pandas as pd
 import pytest
 
-from src.config.settings import DIAS_POR_ANO, FAIXAS_DIVERSIFICACAO, FAIXAS_RENDA, KEY_COLUMN
+from src.config.settings import (
+    CLASSIFICACAO_LABELS,
+    DIAS_POR_ANO,
+    FAIXAS_DIVERSIFICACAO,
+    FAIXAS_RENDA,
+    KEY_COLUMN,
+)
 from src.features.associados import (
     FAIXA_RENDA_NAO_INFORMADO,
     add_faixa_renda,
@@ -121,3 +127,34 @@ def test_features_consolidadas_contem_indicadores_das_tres_entidades(features_co
         "COMPRAS_CARTAO",
     }
     assert colunas_esperadas <= set(features_consolidadas.columns)
+
+
+# --- Classificação dos associados ---
+
+
+def test_classificacao_dominio(features_consolidadas):
+    assert set(features_consolidadas["CLASSIFICACAO"].dropna().unique()) == set(CLASSIFICACAO_LABELS)
+    assert features_consolidadas["CLASSIFICACAO"].notna().all()
+
+
+def test_classificacao_grupos_balanceados(features_consolidadas):
+    contagem = features_consolidadas["CLASSIFICACAO"].value_counts()
+    esperado = len(features_consolidadas) / len(CLASSIFICACAO_LABELS)
+    assert (contagem.between(esperado * 0.9, esperado * 1.1)).all()
+
+
+def test_classificacao_indice_no_dominio_0_1(features_consolidadas):
+    assert features_consolidadas["INDICE_CLASSIFICACAO"].between(0, 1).all()
+
+
+def test_classificacao_tempo_indisponivel_consistente_com_tempo_nulo(features_consolidadas):
+    tempo_nulo = features_consolidadas["TEMPO_RELACIONAMENTO_ANOS"].isna()
+    assert (features_consolidadas.loc[tempo_nulo, "CLASSIFICACAO_TEMPO_INDISPONIVEL"]).all()
+    assert (~features_consolidadas.loc[~tempo_nulo, "CLASSIFICACAO_TEMPO_INDISPONIVEL"]).all()
+    assert features_consolidadas.loc[tempo_nulo, "CLASSIFICACAO"].notna().all()
+
+
+def test_classificacao_ordem_coerente_com_saldo_medio(features_consolidadas):
+    medias = features_consolidadas.groupby("CLASSIFICACAO", observed=True)["SALDO_MEDIO"].mean()
+    medias = medias.reindex(CLASSIFICACAO_LABELS)
+    assert medias.is_monotonic_increasing

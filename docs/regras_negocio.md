@@ -43,19 +43,44 @@ Tercis de referência (calculados sobre a base Bronze — recalcular após trata
 
 ## 5. Classificação dos Associados
 
-Avaliação **sequencial top-down**: a primeira regra satisfeita define a classificação. Isso evita sobreposição entre os critérios de exemplo do desafio (ex.: "4+ produtos" aparece tanto em Maduro quanto em Engajado).
+### 5.1 Técnicas avaliadas
 
-| Ordem | Classificação | Critério |
+As regras sequenciais manuais descritas na primeira versão deste documento (top-down, "primeira regra satisfeita vence") serviam apenas como exemplo do desafio técnico. Testadas sobre a base Gold real (`data/2_gold/features.parquet`, 1000 associados), elas jogavam **83,1%** dos associados na regra de fallback ("Em Desenvolvimento"), porque as regras 1–4 exigem AND de 2–3 condições simultâneas e cobrem poucas combinações — um resultado pouco informativo para o gráfico de distribuição da Página 3 do dashboard. Por isso a metodologia foi revista:
+
+| Abordagem | Avaliação |
+|---|---|
+|
+| **Índice composto por percentil, com corte em quartis** *(adotada)* | Cada associado recebe uma pontuação de 0 a 1 combinando as quatro dimensões pedidas no desafio (Produtos, Relacionamento, Saldo, Utilização); a base inteira é então dividida em quartis dessa pontuação. Solução determinística entre execuções, e por construção produz quatro grupos de tamanho comparável — resolvendo o desbalanceamento das regras sequenciais. Avaliar com stakeholders, e verificar se alguma dimensão possui alguma peso maior ou preferencial, isso produzira estimativas e quebras da regras mais aderente as estratégias da Cooperativa|
+
+### 5.2 Metodologia adotada — Índice de Classificação
+
+Cada associado recebe uma pontuação por **percentil (rank percentual, 0 a 1)** em cada uma das quatro dimensões pedidas:
+
+| Dimensão | Indicador-base | Coluna do pilar |
 |---|---|---|
-| 1 | **Engajado** | QTD_PRODUTOS ≥ 5 **E** TEMPO_RELACIONAMENTO_ANOS > 3 **E** NIVEL_MOVIMENTACAO = Alta |
-| 2 | **Maduro** | QTD_PRODUTOS ≥ 4 **E** TEMPO_RELACIONAMENTO_ANOS > 3 **E** NIVEL_MOVIMENTACAO ∈ {Média, Alta} |
-| 3 | **Em Desenvolvimento** | QTD_PRODUTOS ∈ {2, 3} **E** TEMPO_RELACIONAMENTO_ANOS ≥ 2 |
-| 4 | **Inicial** | QTD_PRODUTOS ≤ 1 **E** TEMPO_RELACIONAMENTO_ANOS < 2 |
-| 5 | **Em Desenvolvimento** (regra de fallback) | Qualquer combinação não coberta pelas regras 1–4 (ex.: poucos produtos mas relacionamento antigo, ou muitos produtos mas movimentação baixa) |
+| Produtos | `INDICE_DIVERSIFICACAO` (item 1) | `SCORE_PRODUTOS` |
+| Relacionamento | `TEMPO_RELACIONAMENTO_ANOS` (item 2) | `SCORE_RELACIONAMENTO` |
+| Saldo | `SALDO_MEDIO` | `SCORE_SALDO` |
+| Utilização | média do percentil de `PIX_MENSAL` e `COMPRAS_CARTAO` | `SCORE_UTILIZACAO` |
 
-A regra 5 é explícita para garantir que **todo** associado receba uma classificação do domínio {Inicial, Em Desenvolvimento, Maduro, Engajado}, sem categoria residual "Outro" no dashboard.
+`INDICE_CLASSIFICACAO` = soma ponderada dos quatro pilares, pesos em `CLASSIFICACAO_PESOS` (`src/config/settings.py`) — 25% cada por padrão, já que nenhuma das quatro dimensões tem prioridade documentada sobre as demais no desafio.
 
-Associados com `TEMPO_RELACIONAMENTO_ANOS` nulo (data futura inválida) são classificados usando apenas `QTD_PRODUTOS` e `NIVEL_MOVIMENTACAO`, com sinalização `CLASSIFICACAO_TEMPO_INDISPONIVEL = True` para transparência no dashboard.
+Associados com `TEMPO_RELACIONAMENTO_ANOS` nulo (data futura inválida, 37 registros — ver seção 2) recebem `SCORE_RELACIONAMENTO = 0,5` (mediana neutra), para não penalizar nem favorecer artificialmente o índice, com sinalização `CLASSIFICACAO_TEMPO_INDISPONIVEL = True` para transparência no dashboard — mesma lógica de transparência já usada em `DATA_ASSOCIACAO_INVALIDA`.
+
+`CLASSIFICACAO` é obtida dividindo `INDICE_CLASSIFICACAO` em quartis (25% cada), rotulados em ordem crescente de pontuação, do domínio `CLASSIFICACAO_LABELS`:
+
+**Inicial** (Q1) → **Em Desenvolvimento** (Q2) → **Maduro** (Q3) → **Engajado** (Q4)
+
+### 5.3 Validação sobre a base Gold real
+
+Sobre os mesmos 1000 registros: distribuição exatamente 250/250/250/250 entre as quatro categorias (por construção dos quartis), e as médias dos cinco indicadores brutos crescem monotonicamente de Inicial para Engajado — evidência de que o índice composto captura uma progressão de relacionamento coerente, não é um artefato da fórmula:
+
+| Classificação | QTD_PRODUTOS (méd.) | TEMPO_RELACIONAMENTO_ANOS (méd.) | SALDO_MEDIO (méd.) | PIX_MENSAL (méd.) | COMPRAS_CARTAO (méd.) |
+|---|---|---|---|---|---|
+| Inicial | 2,1 | 2,7 | 70.643 | 38,9 | 7.952 |
+| Em Desenvolvimento | 2,9 | 3,7 | 109.010 | 48,2 | 9.615 |
+| Maduro | 3,2 | 4,9 | 137.643 | 53,9 | 10.364 |
+| Engajado | 3,8 | 6,0 | 176.164 | 60,0 | 12.229 |
 
 ## 6. Critérios de Oportunidade
 

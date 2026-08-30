@@ -1,5 +1,6 @@
 from src.config.settings import KEY_COLUMN
 from src.features.associados import add_faixa_renda, add_indicadores_relacionamento
+from src.features.classificacao import add_classificacao
 from src.features.produtos import add_indicadores_produtos
 
 
@@ -9,5 +10,6 @@ def build_features(associados, produtos, movimentacao, reference_date=None):
 
     df = associados.merge(produtos, on=KEY_COLUMN, how="inner")
     df = df.merge(movimentacao, on=KEY_COLUMN, how="inner")
+    df = add_classificacao(df)
 
     return df
