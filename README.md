@@ -28,8 +28,5 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 | 04.02 Inventariar fonte | **Concluído** | Abas `Associados`, `Produtos` e `Movimentacao`, seus campos e tipos mapeados em `docs/dicionario_dados.md`; profiling completo em `docs/qualidade_dados.md`. |
 | 04.03 Documentar imutabilidade | **Pendente** | A regra de que a camada Bronze não pode ser alterada pelo pipeline ainda não está documentada explicitamente em nenhum arquivo do projeto. |
 
-### Pendências técnicas identificadas
-- `src/pipeline.py` importa módulos inexistentes (`src.io.excel`, `src.validation.quality`) — o pipeline não executa no estado atual do código.
-- `src/cleaning/*.py` e `src/features/associados.py` estão vazios/esqueleto, sem lógica de limpeza ou de cálculo de indicadores implementada.
-- Ambiente virtual `.venv/` criado localmente e ignorado via `.gitignore`; dependências de `requirements.txt` (pandas, openpyxl, pyarrow, pytest) instaladas.
-- `tests/` e `powerbi/` ainda não existem no repositório.
+
+
