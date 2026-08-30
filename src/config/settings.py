@@ -48,16 +48,16 @@ PRODUCT_COLUMNS = EXPECTED_COLUMNS_PRODUTOS[1:]
 DIAS_POR_ANO = 365.25
 
 FAIXAS_RENDA = (
-    ("Até R$ 3.000", 0, 3_000),
-    ("R$ 3.001 a R$ 8.000", 3_000, 8_000),
-    ("R$ 8.001 a R$ 15.000", 8_000, 15_000),
-    ("Acima de R$ 15.000", 15_000, None),
+    ("A - Até R$ 3.000", 0, 3_000),
+    ("B - R$ 3.001 a R$ 8.000", 3_000, 8_000),
+    ("C - R$ 8.001 a R$ 15.000", 8_000, 15_000),
+    ("D - Acima de R$ 15.000", 15_000, None),
 )
 
 FAIXAS_DIVERSIFICACAO = (
-    ("Baixa", 0, 1),
-    ("Média", 2, 4),
-    ("Alta", 5, len(PRODUCT_COLUMNS)),
+    ("0 - Baixa", 0, 1),
+    ("1 - Média", 2, 4),
+    ("2 - Alta", 5, len(PRODUCT_COLUMNS)),
 )
 
 TERCIS_MOVIMENTACAO = {

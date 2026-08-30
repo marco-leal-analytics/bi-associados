@@ -24,7 +24,7 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 ### 03 — Estruturação da Arquitetura
 | Item | Status | Observação |
 |---|---|---|
-| 03.01 Estruturar camadas de dados | **Parcial** | Camadas existem como `data/0_bronze`, `data/1_silver`, `data/2_gold` — nomenclatura numerada, diferente do padrão `bronze/silver/gold` do cronograma. `data/2_gold` ainda não tem arquivos gerados. |
+| 03.01 Estruturar camadas de dados | **Parcial** | Camadas existem como `data/0_bronze`, `data/1_silver`, `data/2_gold` — nomenclatura numerada, diferente do padrão `bronze/silver/gold` do cronograma. `data/2_gold` já contém `features.parquet` (ver item 10.04). |
 | 03.02 Estruturar módulos Python | **Parcial** | `src/config`, `src/io`, `src/cleaning` implementados e em uso; `src/features` iniciado (`produtos.py`, `associados.py` ainda vazio). `src/validation` **não existe como módulo dedicado** — validações hoje estão embutidas em `src/cleaning/common.py` e nos testes. Há também `src/utils` (logging), não previsto no cronograma. |
 | 03.03 Estruturar testes e documentação | **Concluído** | `docs/` com conteúdo substancial; `tests/test_silver.py` e `tests/test_features.py` implementados e passando. |
 | 03.04 Preparar Power BI | **Pendente** | `powerbi/Associados360.pbip` ainda não criado. |
@@ -69,7 +69,7 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 | 08.01 Validar Bronze | **Pendente** | `EXPECTED_COLUMNS_*` estão centralizadas em `settings.py`, mas não há validação explícita de schema executada sobre a leitura da fonte Bronze (não existe `quality.py`/`src/validation`). |
 | 08.02 Validar CHAVE | **Parcial** | Unicidade e cardinalidade de `CHAVE` são garantidas em `handle_duplicate_keys` (cleaning) e confirmadas em `tests/test_silver.py`, mas não em um módulo de validação dedicado. |
 | 08.03 Validar nulos, categorias e tipos | **Parcial** | Cobertas por `validate_domain`/`assert_allowed_nulls` (cleaning) e por `tests/test_silver.py`, sem módulo `quality.py`/`validation` próprio. |
-| 08.04 Validar camadas | **Parcial** | Integridade referencial entre Associados/Produtos/Movimentacao validada em `tests/test_silver.py` (`test_chaves_identicas_entre_entidades`); validação Silver ↔ Gold ainda não se aplica, pois a Gold não foi gerada. |
+| 08.04 Validar camadas | **Parcial** | Integridade referencial entre Associados/Produtos/Movimentacao validada em `tests/test_silver.py` (`test_chaves_identicas_entre_entidades`). A consolidação Silver → Gold (`data/2_gold/features.parquet`) é validada em `tests/test_features.py` (chave única e completa, colunas esperadas presentes), mas sem módulo de validação dedicado. |
 
 ### 09 — Construção da Silver
 | Item | Status | Observação |
@@ -82,9 +82,10 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 ### 10 — Features Analíticas
 | Item | Status | Observação |
 |---|---|---|
-| 10.01 Indicadores de produtos | **Concluído** | `src/features/produtos.py` (`add_indicadores_produtos`): `INDICE_DIVERSIFICACAO` (proporção de produtos possuídos sobre o total possível) e `NIVEL_DIVERSIFICACAO` (categórico ordenado Baixa/Média/Alta, faixas em `FAIXAS_DIVERSIFICACAO`, `src/config/settings.py`), calculados sobre `QTD_PRODUTOS` já existente na Silver. Testado em `tests/test_features.py`. |
+| 10.01 Indicadores de produtos | **Concluído** | `src/features/produtos.py` (`add_indicadores_produtos`): `INDICE_DIVERSIFICACAO` (proporção de produtos possuídos sobre o total possível) e `NIVEL_DIVERSIFICACAO` (categórico ordenado, rótulos `"0 - Baixa"` / `"1 - Média"` / `"2 - Alta"` — prefixo numérico para ordenação correta no Power BI —, faixas em `FAIXAS_DIVERSIFICACAO`, `src/config/settings.py`), calculados sobre `QTD_PRODUTOS` já existente na Silver. Testado em `tests/test_features.py` (rótulos derivados de `FAIXAS_DIVERSIFICACAO`, não fixos no teste). |
 | 10.02 Tempo de relacionamento | **Concluído** | `src/features/associados.py` (`add_indicadores_relacionamento`): `TEMPO_RELACIONAMENTO_DIAS` e `TEMPO_RELACIONAMENTO_ANOS` (`dias / DIAS_POR_ANO`) a partir de `DATA_REFERENCIA − DATA_ASSOCIACAO`. Ver decisão sobre datas futuras abaixo. Testado em `tests/test_features.py`. |
-| 10.03 Faixas de renda | **Concluído** | `src/features/associados.py` (`add_faixa_renda`): categoriza `RENDA_MENSAL` em `FAIXA_RENDA` (Até R$3.000 / R$3.001–8.000 / R$8.001–15.000 / Acima de R$15.000), faixas definidas em `FAIXAS_RENDA` (`src/config/settings.py`). Os 12 registros com `RENDA_MENSAL` nula recebem a categoria `"Não informado"`, conforme `docs/regras_negocio.md` (seção 3), em vez de serem excluídos ou imputados. Testado em `tests/test_features.py`. Demais indicadores da fase (movimentação, classificação, oportunidades) ainda pendentes. |
+| 10.03 Faixas de renda | **Concluído** | `src/features/associados.py` (`add_faixa_renda`): categoriza `RENDA_MENSAL` em `FAIXA_RENDA`, rótulos `"A - Até R$ 3.000"` / `"B - R$ 3.001 a R$ 8.000"` / `"C - R$ 8.001 a R$ 15.000"` / `"D - Acima de R$ 15.000"` (prefixo alfabético para ordenação no Power BI), faixas definidas em `FAIXAS_RENDA` (`src/config/settings.py`). Os 12 registros com `RENDA_MENSAL` nula recebem a categoria `"Não informado"`, conforme `docs/regras_negocio.md` (seção 3), em vez de serem excluídos ou imputados. Testado em `tests/test_features.py`. |
+| 10.04 Consolidar features | **Concluído** | `src/features/consolidado.py` (`build_features`): aplica os indicadores de produtos e relacionamento sobre as respectivas entidades e faz `merge` por `CHAVE` das três bases Silver (`associados` ⋈ `produtos` ⋈ `movimentacao`) em um único dataset de 1000 linhas / 25 colunas. Orquestrado em `src/pipeline.py` (`build_gold_features`), persistido em `data/2_gold/features.parquet` — insumo para Classificação (fase futura) e Power BI. Testado em `tests/test_features.py`. Indicadores de `NIVEL_MOVIMENTACAO` e `CLASSIFICACAO` (fases seguintes do cronograma) ainda pendentes. |
 
 #### Tratamento de datas futuras em TEMPO_RELACIONAMENTO
 
@@ -98,5 +99,22 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 | **Nulo (NaN), preservando o registro** *(adotada)* | Não fabrica valor, mantém o associado íntegro na base e o problema visível/auditável. |
 
 Solução adotada: a camada Silver (`src/cleaning/associados.py`) sinaliza a inconsistência em `DATA_ASSOCIACAO_INVALIDA`, sem alterar `DATA_ASSOCIACAO` na origem. A camada Features usa essa flag para mascarar `TEMPO_RELACIONAMENTO_DIAS`/`TEMPO_RELACIONAMENTO_ANOS` como nulos apenas nesses 37 registros, mantendo a decisão já formalizada em `docs/regras_negocio.md` (seção 2) — o registro segue disponível para as demais análises, mas nulo para tempo de relacionamento, e cabe à Classificação (fase futura) tratá-lo com a flag `CLASSIFICACAO_TEMPO_INDISPONIVEL`.
+
+## Como executar
+
+```
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python -m src.pipeline
+```
+
+Rode sempre a partir da **raiz do projeto** (a pasta que contém `src/`), usando `python -m src.pipeline` — nunca `python src/pipeline.py` nem `cd src && python pipeline.py`. `pipeline.py` usa imports absolutos (`from src.cleaning...`); a flag `-m` executa o arquivo como módulo do pacote `src`, colocando a raiz do projeto no `sys.path`. Rodando de outra forma, o Python não encontra `src` e falha com `ModuleNotFoundError: No module named 'src'`.
+
+O comando acima gera/atualiza, em ordem:
+- `data/1_silver/associados.parquet`, `produtos.parquet`, `movimentacao.parquet` (camada Silver)
+- `data/2_gold/features.parquet` (camada Features/Gold consolidada)
+
+Para rodar os testes: `pytest tests/ -q` (também a partir da raiz do projeto).
 
 

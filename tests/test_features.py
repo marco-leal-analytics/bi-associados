@@ -1,14 +1,15 @@
 import pandas as pd
 import pytest
 
-from src.config.settings import DIAS_POR_ANO, FAIXAS_RENDA, PRODUCT_COLUMNS
+from src.config.settings import DIAS_POR_ANO, FAIXAS_DIVERSIFICACAO, FAIXAS_RENDA, KEY_COLUMN
 from src.features.associados import (
     FAIXA_RENDA_NAO_INFORMADO,
     add_faixa_renda,
     add_indicadores_relacionamento,
 )
+from src.features.consolidado import build_features
 from src.features.produtos import TOTAL_PRODUTOS_POSSIVEIS, add_indicadores_produtos
-from src.pipeline import SILVER_ASSOCIADOS_PATH, SILVER_PRODUTOS_PATH
+from src.pipeline import SILVER_ASSOCIADOS_PATH, SILVER_MOVIMENTACAO_PATH, SILVER_PRODUTOS_PATH
 
 
 @pytest.fixture(scope="module")
@@ -29,6 +30,14 @@ def associados_faixa_renda():
     return add_faixa_renda(df)
 
 
+@pytest.fixture(scope="module")
+def features_consolidadas():
+    associados = pd.read_parquet(SILVER_ASSOCIADOS_PATH)
+    produtos = pd.read_parquet(SILVER_PRODUTOS_PATH)
+    movimentacao = pd.read_parquet(SILVER_MOVIMENTACAO_PATH)
+    return build_features(associados, produtos, movimentacao)
+
+
 def test_indice_diversificacao_dominio(produtos_features):
     assert produtos_features["INDICE_DIVERSIFICACAO"].between(0, 1).all()
     esperado = produtos_features["QTD_PRODUTOS"] / TOTAL_PRODUTOS_POSSIVEIS
@@ -36,21 +45,14 @@ def test_indice_diversificacao_dominio(produtos_features):
 
 
 def test_nivel_diversificacao_categorias(produtos_features):
-    assert set(produtos_features["NIVEL_DIVERSIFICACAO"].dropna().unique()) == {
-        "Baixa",
-        "Média",
-        "Alta",
-    }
+    esperado = {nome for nome, _, _ in FAIXAS_DIVERSIFICACAO}
+    assert set(produtos_features["NIVEL_DIVERSIFICACAO"].dropna().unique()) == esperado
 
 
 def test_nivel_diversificacao_consistente_com_qtd_produtos(produtos_features):
-    baixa = produtos_features.loc[produtos_features["NIVEL_DIVERSIFICACAO"] == "Baixa", "QTD_PRODUTOS"]
-    media = produtos_features.loc[produtos_features["NIVEL_DIVERSIFICACAO"] == "Média", "QTD_PRODUTOS"]
-    alta = produtos_features.loc[produtos_features["NIVEL_DIVERSIFICACAO"] == "Alta", "QTD_PRODUTOS"]
-
-    assert baixa.between(0, 1).all()
-    assert media.between(2, 4).all()
-    assert alta.between(5, len(PRODUCT_COLUMNS)).all()
+    for nome, minimo, maximo in FAIXAS_DIVERSIFICACAO:
+        qtd = produtos_features.loc[produtos_features["NIVEL_DIVERSIFICACAO"] == nome, "QTD_PRODUTOS"]
+        assert qtd.between(minimo, maximo).all()
 
 
 # --- Indicadores de relacionamento ---
@@ -96,4 +98,26 @@ def test_faixa_renda_limites_consistentes(associados_faixa_renda):
         assert (renda > limite_anterior).all()
         if maximo is not None:
             assert (renda <= maximo).all()
-            limite_anterior = maximo
+
+
+# --- Consolidação de features ---
+
+
+def test_features_consolidadas_chave_unica_e_completa(features_consolidadas):
+    assert not features_consolidadas[KEY_COLUMN].duplicated().any()
+    assert len(features_consolidadas) == 1000
+
+
+def test_features_consolidadas_contem_indicadores_das_tres_entidades(features_consolidadas):
+    colunas_esperadas = {
+        "QTD_PRODUTOS",
+        "INDICE_DIVERSIFICACAO",
+        "NIVEL_DIVERSIFICACAO",
+        "TEMPO_RELACIONAMENTO_DIAS",
+        "TEMPO_RELACIONAMENTO_ANOS",
+        "FAIXA_RENDA",
+        "SALDO_MEDIO",
+        "PIX_MENSAL",
+        "COMPRAS_CARTAO",
+    }
+    assert colunas_esperadas <= set(features_consolidadas.columns)

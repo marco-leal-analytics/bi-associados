@@ -21,8 +21,8 @@ def add_indicadores_relacionamento(df, reference_date=None):
 def add_faixa_renda(df):
     df = df.copy()
 
-    bins = [0] + [max_valor for _, _, max_valor in FAIXAS_RENDA[:-1]] + [float("inf")]
-    labels = [nome for nome, _, _ in FAIXAS_RENDA]
+    labels, _, maximos = zip(*FAIXAS_RENDA)
+    bins = [0, *maximos[:-1], float("inf")]
 
     faixa = pd.cut(df["RENDA_MENSAL"], bins=bins, labels=labels, include_lowest=True)
     df["FAIXA_RENDA"] = faixa.cat.add_categories([FAIXA_RENDA_NAO_INFORMADO]).fillna(
