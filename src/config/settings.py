@@ -76,7 +76,7 @@ CLASSIFICACAO_PESOS = {
 }
 
 OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS = {
-    "faixa_renda": "Acima de R$ 15.000",
+    "faixa_renda": FAIXAS_RENDA[-1][0],
     "qtd_produtos_max": 2,
 }
 OPORTUNIDADE_BAIXA_UTILIZACAO = {

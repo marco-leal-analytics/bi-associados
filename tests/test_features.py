@@ -7,6 +7,10 @@ from src.config.settings import (
     FAIXAS_DIVERSIFICACAO,
     FAIXAS_RENDA,
     KEY_COLUMN,
+    OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS,
+    OPORTUNIDADE_BAIXA_UTILIZACAO,
+    OPORTUNIDADE_POTENCIAL_CRESCIMENTO,
+    TERCIS_MOVIMENTACAO,
 )
 from src.features.associados import (
     FAIXA_RENDA_NAO_INFORMADO,
@@ -14,6 +18,7 @@ from src.features.associados import (
     add_indicadores_relacionamento,
 )
 from src.features.consolidado import build_features
+from src.features.movimentacao import NIVEIS_MOVIMENTACAO
 from src.features.produtos import TOTAL_PRODUTOS_POSSIVEIS, add_indicadores_produtos
 from src.pipeline import SILVER_ASSOCIADOS_PATH, SILVER_MOVIMENTACAO_PATH, SILVER_PRODUTOS_PATH
 
@@ -125,8 +130,29 @@ def test_features_consolidadas_contem_indicadores_das_tres_entidades(features_co
         "SALDO_MEDIO",
         "PIX_MENSAL",
         "COMPRAS_CARTAO",
+        "NIVEL_MOVIMENTACAO",
     }
     assert colunas_esperadas <= set(features_consolidadas.columns)
+
+
+# --- Nível de movimentação ---
+
+
+def test_nivel_movimentacao_dominio(features_consolidadas):
+    assert set(features_consolidadas["NIVEL_MOVIMENTACAO"].dropna().unique()) <= set(NIVEIS_MOVIMENTACAO)
+    assert features_consolidadas["NIVEL_MOVIMENTACAO"].notna().all()
+
+
+def test_nivel_movimentacao_consistente_com_tercis_saldo_medio(features_consolidadas):
+    baixo, alto = TERCIS_MOVIMENTACAO["SALDO_MEDIO"]
+    coincide_com_saldo = features_consolidadas["NIVEL_MOVIMENTACAO"] == pd.cut(
+        features_consolidadas["SALDO_MEDIO"],
+        bins=[-float("inf"), baixo, alto, float("inf")],
+        labels=NIVEIS_MOVIMENTACAO,
+    )
+    # SALDO_MEDIO é o critério de desempate; deve coincidir na maioria dos casos
+    # (todas as linhas onde não houve empate entre os três indicadores).
+    assert coincide_com_saldo.mean() > 0.5
 
 
 # --- Classificação dos associados ---
@@ -158,3 +184,43 @@ def test_classificacao_ordem_coerente_com_saldo_medio(features_consolidadas):
     medias = features_consolidadas.groupby("CLASSIFICACAO", observed=True)["SALDO_MEDIO"].mean()
     medias = medias.reindex(CLASSIFICACAO_LABELS)
     assert medias.is_monotonic_increasing
+
+
+# --- Flags de oportunidade ---
+
+
+def test_flag_alta_renda_poucos_produtos_consistente(features_consolidadas):
+    cfg = OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS
+    flag = features_consolidadas["FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS"]
+    esperado = (features_consolidadas["FAIXA_RENDA"] == cfg["faixa_renda"]) & (
+        features_consolidadas["QTD_PRODUTOS"] <= cfg["qtd_produtos_max"]
+    )
+    assert (flag == esperado).all()
+
+
+def test_flag_baixa_utilizacao_consistente(features_consolidadas):
+    cfg = OPORTUNIDADE_BAIXA_UTILIZACAO
+    flag = features_consolidadas["FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO"]
+    esperado = (features_consolidadas["NIVEL_MOVIMENTACAO"] == cfg["nivel_movimentacao"]) & (
+        features_consolidadas["QTD_PRODUTOS"] >= cfg["qtd_produtos_min"]
+    )
+    assert (flag == esperado).all()
+
+
+def test_flag_potencial_crescimento_consistente(features_consolidadas):
+    cfg = OPORTUNIDADE_POTENCIAL_CRESCIMENTO
+    flag = features_consolidadas["FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO"]
+    esperado = (features_consolidadas["CLASSIFICACAO"] == cfg["classificacao"]) & (
+        features_consolidadas["NIVEL_MOVIMENTACAO"].isin(cfg["nivel_movimentacao"])
+    )
+    assert (flag == esperado).all()
+
+
+def test_flags_oportunidade_sao_booleanas(features_consolidadas):
+    colunas = [
+        "FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS",
+        "FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO",
+        "FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO",
+    ]
+    for coluna in colunas:
+        assert features_consolidadas[coluna].dtype == bool
