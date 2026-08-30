@@ -66,7 +66,7 @@ TERCIS_MOVIMENTACAO = {
     "COMPRAS_CARTAO": (6_745, 13_131),
 }
 
-CLASSIFICACAO_LABELS = ("Inicial", "Em Desenvolvimento", "Maduro", "Engajado")
+CLASSIFICACAO_LABELS = ("A - Inicial", "B - Em Desenvolvimento", "C - Maduro", "D - Engajado")
 
 CLASSIFICACAO_PESOS = {
     "produtos": 0.25,
@@ -84,6 +84,6 @@ OPORTUNIDADE_BAIXA_UTILIZACAO = {
     "qtd_produtos_min": 2,
 }
 OPORTUNIDADE_POTENCIAL_CRESCIMENTO = {
-    "classificacao": "Em Desenvolvimento",
+    "classificacao": CLASSIFICACAO_LABELS[1],
     "nivel_movimentacao": {"Média", "Alta"},
 }

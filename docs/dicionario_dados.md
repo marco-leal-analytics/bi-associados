@@ -73,9 +73,11 @@ Calculados a partir da base Silver — ver metodologia e limiares completos em `
 | TEMPO_RELACIONAMENTO_DIAS | DATA_REFERENCIA − DATA_ASSOCIACAO | int | Dias desde a associação |
 | TEMPO_RELACIONAMENTO_ANOS | TEMPO_RELACIONAMENTO_DIAS / 365,25 | float | Anos de relacionamento (arredondado para exibição) |
 | FAIXA_RENDA | Faixa de RENDA_MENSAL (ver regras de negócio) | category | Até R$3.000 / R$3.001–R$8.000 / R$8.001–R$15.000 / Acima de R$15.000 |
-| NIVEL_MOVIMENTACAO | Combinação de SALDO_MEDIO, PIX_MENSAL, COMPRAS_CARTAO por tercis | category | Baixa / Média / Alta |
-| CLASSIFICACAO | Regra combinando QTD_PRODUTOS, TEMPO_RELACIONAMENTO_ANOS e NIVEL_MOVIMENTACAO | category | Inicial / Em Desenvolvimento / Maduro / Engajado |
-| FLAG_OPORTUNIDADE_* | Regras de cruzamento (ver `regras_negocio.md`) | bool | Ex.: alta renda + poucos produtos; baixa utilização; potencial de crescimento |
+| NIVEL_MOVIMENTACAO | Moda entre os tercis de SALDO_MEDIO, PIX_MENSAL e COMPRAS_CARTAO, desempate por SALDO_MEDIO | category | Baixa / Média / Alta |
+| CLASSIFICACAO | Índice composto por percentil (INDICE_CLASSIFICACAO) das quatro dimensões — Produtos, Relacionamento, Saldo, Utilização — cortado em quartis | category (ordenada) | "A - Inicial" / "B - Em Desenvolvimento" / "C - Maduro" / "D - Engajado" (prefixo alfabético para ordenação no Power BI) |
+| FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS | FAIXA_RENDA = "Acima de R$ 15.000" E QTD_PRODUTOS ≤ 2 | bool | Ver `regras_negocio.md` (seção 6) |
+| FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO | NIVEL_MOVIMENTACAO = Baixa E QTD_PRODUTOS ≥ 2 | bool | Ver `regras_negocio.md` (seção 6) |
+| FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO | CLASSIFICACAO = "Em Desenvolvimento" E NIVEL_MOVIMENTACAO ∈ {Média, Alta} | bool | Ver `regras_negocio.md` (seção 6) |
 
 ## Observação sobre os dados
 
