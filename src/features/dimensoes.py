@@ -7,6 +7,7 @@ estrela no Power BI e para não repetir o rótulo textual em cada linha da fato.
 import pandas as pd
 
 from src.config.settings import (
+    DIM_AGENCIA,
     DIM_CLASSIFICACAO,
     DIM_FAIXA_RENDA,
     DIM_NIVEL_DIVERSIFICACAO,
@@ -15,6 +16,8 @@ from src.config.settings import (
 
 ID_COLUMN = "ID"
 DESCRICAO_COLUMN = "DESCRICAO"
+AGENCIA_COLUMN = "AGENCIA"
+NOME_AGENCIA_COLUMN = "NOME_AGENCIA"
 
 
 def _build_dim(pairs):
@@ -48,3 +51,23 @@ def build_dimensions():
         "nivel_movimentacao": _build_dim(DIM_NIVEL_MOVIMENTACAO),
         "classificacao": _build_dim(DIM_CLASSIFICACAO),
     }
+
+
+def build_dim_agencia():
+    """Monta a dimensão AGENCIA (código -> nome de agência).
+
+    Diferente das quatro dimensões de `build_dimensions` (faixa/classe
+    calculada sobre os dados, relacionada à fato por um `*_ID`), esta
+    relaciona-se com a fato diretamente pela coluna `AGENCIA` — mesmo
+    padrão usado por `dim_calendario` (`src/features/calendario.py`),
+    por isso fica fora do dicionário genérico. Conteúdo de `DIM_AGENCIA`
+    (`src/config/settings.py`) é levantamento de negócio (nomes reais de
+    agências da cooperativa), não cálculo sobre a base.
+
+    Returns:
+        `DataFrame` com as colunas `AGENCIA` (int64) e `NOME_AGENCIA`
+        (string), uma linha por código de agência.
+    """
+    return pd.DataFrame(DIM_AGENCIA, columns=[AGENCIA_COLUMN, NOME_AGENCIA_COLUMN]).astype(
+        {AGENCIA_COLUMN: "int64", NOME_AGENCIA_COLUMN: "string"}
+    )

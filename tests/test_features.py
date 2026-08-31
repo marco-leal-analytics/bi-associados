@@ -9,6 +9,7 @@ import pytest
 from src.config.settings import (
     DASHBOARD_COLUMNS,
     DIAS_POR_ANO,
+    DIM_AGENCIA,
     DIM_CLASSIFICACAO,
     DIM_FAIXA_RENDA,
     DIM_NIVEL_DIVERSIFICACAO,
@@ -24,7 +25,7 @@ from src.config.settings import (
 )
 from src.features.associados import add_faixa_renda, add_indicadores_relacionamento
 from src.features.consolidado import build_dashboard_features, build_features
-from src.features.dimensoes import build_dimensions
+from src.features.dimensoes import build_dim_agencia, build_dimensions
 from src.features.movimentacao import IDS_NIVEL_MOVIMENTACAO
 from src.features.produtos import TOTAL_PRODUTOS_POSSIVEIS, add_indicadores_produtos
 from src.pipeline import SILVER_ASSOCIADOS_PATH, SILVER_MOVIMENTACAO_PATH, SILVER_PRODUTOS_PATH
@@ -66,6 +67,12 @@ def features_consolidadas():
 def dimensoes():
     """As quatro tabelas de dimensão (ID -> descrição) da Gold."""
     return build_dimensions()
+
+
+@pytest.fixture(scope="module")
+def dim_agencia():
+    """Dimensão AGENCIA (código -> nome de agência)."""
+    return build_dim_agencia()
 
 
 def test_indice_diversificacao_dominio(produtos_features):
@@ -289,6 +296,26 @@ def test_dimensao_classificacao_bate_com_settings(dimensoes):
     esperado = {id_: descricao for id_, descricao in DIM_CLASSIFICACAO}
     obtido = dict(zip(dimensoes["classificacao"]["ID"], dimensoes["classificacao"]["DESCRICAO"]))
     assert obtido == esperado
+
+
+# --- Dimensão AGENCIA ---
+
+
+def test_dim_agencia_schema_e_chave_unica(dim_agencia):
+    assert list(dim_agencia.columns) == ["AGENCIA", "NOME_AGENCIA"]
+    assert not dim_agencia["AGENCIA"].duplicated().any()
+    assert dim_agencia["NOME_AGENCIA"].notna().all()
+
+
+def test_dim_agencia_bate_com_settings(dim_agencia):
+    esperado = {codigo: nome for codigo, nome in DIM_AGENCIA}
+    obtido = dict(zip(dim_agencia["AGENCIA"], dim_agencia["NOME_AGENCIA"]))
+    assert obtido == esperado
+
+
+def test_agencia_da_fato_existe_na_dim_agencia(features_consolidadas, dim_agencia):
+    """Integridade referencial: todo código AGENCIA da fato deve existir na dimensão."""
+    assert set(features_consolidadas["AGENCIA"].unique()) <= set(dim_agencia["AGENCIA"])
 
 
 # --- Tabela reduzida para o Power BI ---

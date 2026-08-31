@@ -128,6 +128,29 @@ DIM_CLASSIFICACAO = (
 )
 CLASSIFICACAO_IDS = tuple(id_ for id_, _ in DIM_CLASSIFICACAO)
 
+# Dimensão AGENCIA: a Bronze traz só o código {1..5} da agência, sem nome
+# (ver docs/dicionario_dados.md, seção 1). Diferente das dimensões acima —
+# faixas/classificações calculadas sobre os próprios dados —, esta é
+# levantamento de negócio: nomes de agências reais da cooperativa Sicredi
+# Soma (sede em Mariópolis-PR, atua em 33 municípios do sudoeste do Paraná e
+# oeste/meio-oeste de Santa Catarina, ~43 agências), usando a convenção de
+# nomenclatura do Sicredi (cidade + característica — bairro/via/shopping).
+# Como o código {1..5} do desafio não referencia nenhuma agência real
+# específica, mapeamos os 5 códigos às agências confirmadas via pesquisa
+# pública (site institucional Sicredi Soma, ago/2026): 4 unidades em Pato
+# Branco (cidade predominante na base, ver CIDADE) mais 1 unidade regional,
+# para representar a área de atuação além da sede. Relaciona-se com a fato
+# pela coluna AGENCIA (não por sufixo "_ID", por isso fica fora de
+# `DIM_*` usadas em `build_dimensions` — ver `build_dim_agencia`,
+# `src/features/dimensoes.py`).
+DIM_AGENCIA = (
+    (1, "Pato Branco - Centro"),
+    (2, "Pato Branco - Zona Norte"),
+    (3, "Pato Branco - Zona Sul"),
+    (4, "Pato Branco - PB Shopping"),
+    (5, "Clevelândia - Centro"),
+)
+
 # Pesos de cada pilar na soma ponderada que forma INDICE_CLASSIFICACAO.
 # Devem somar 1.0; 20% cada por padrão (nenhuma dimensão priorizada no
 # desafio) — ver docs/regras_negocio.md (seção 5.2). PIX_MENSAL (quantidade

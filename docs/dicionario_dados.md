@@ -21,7 +21,7 @@ Informações cadastrais do associado.
 |---|---|---|---|---|---|
 | CHAVE | int64 | int64 | Identificador único do associado | 1 a 1000 | Sem nulos, sem duplicidade |
 | NOME | string | string | Nome do associado | "Fernanda Sobrenome" | Apenas 10 nomes distintos para 1000 registros (Interpretação: Coluna criada de forma ficticia: Avaliar em base de dados reais) |
-| AGENCIA | int64 | category/int | Código da agência de relacionamento | {1, 2, 3, 4, 5} | Sem nome de agência associado; tratar como código categórico |
+| AGENCIA | int64 | category/int | Código da agência de relacionamento | {1, 2, 3, 4, 5} | Sem nome de agência na fonte; tratar como código categórico. Nome de negócio (levantamento) disponível em `dim_agencia` (seção 6.6) |
 | CIDADE | string | category (padronizada) | Cidade do associado | "Pato Branco", "Cascavel", "Chapecó", "Toledo", "Maringá" | **Inconsistência de categoria**: mesma cidade grafada de 3 formas — "Pato Branco", "P. Branco", "PATO BRANCO" — e "Chapeco" sem acentuação. Ver regra de padronização em `qualidade_dados.md` |
 | DATA_ASSOCIACAO | datetime | datetime (date) | Data de entrada do associado na cooperativa/instituição | 2018-01-02 a 2026-12-26 | **37 registros com data futura** em relação à data de referência do pipeline — inválido para cálculo de tempo de relacionamento |
 | RENDA_MENSAL | float64 | float64 | Renda mensal declarada | R$ 2.010 a R$ 29.972 | **12 registros nulos (1,2%)** |
@@ -214,6 +214,22 @@ A ordem crescente do ID já reflete a ordem de negócio (pior → melhor) em tod
 | NOME_SEMESTRE | string | "S1"/"S2" |
 
 Diferente das quatro dimensões acima (FK por `*_ID` inteiro), o relacionamento desta dimensão com a fato é por data (`DATA` ↔ `DATA_ASSOCIACAO`), padrão usual de tabela calendário no Power BI.
+
+### 6.6 `dim_agencia.parquet`
+
+A Bronze traz só o código da agência (`AGENCIA`, seção 1) — `{1, 2, 3, 4, 5}`, sem nome associado. Diferente das dimensões 6.1–6.4 (calculadas sobre os próprios dados), esta é levantamento de negócio: nomes reais de agências da cooperativa **Sicredi Soma** (contexto do desafio — sede administrativa em Mariópolis-PR, atuação em 33 municípios do sudoeste do Paraná e oeste/meio-oeste de Santa Catarina, ~43 agências ao todo; pesquisa pública no site institucional, ago/2026).
+
+Como o código `{1..5}` do desafio não referencia nenhuma agência real específica (cada código aparece distribuído por todas as cidades da base — não há relação 1:1 código↔cidade nos dados), os 5 códigos foram mapeados às agências confirmadas via pesquisa: 4 unidades em Pato Branco — cidade predominante em `CIDADE` — seguindo a convenção de nomenclatura do Sicredi (cidade + característica: bairro/via/shopping), mais 1 unidade regional para representar a área de atuação além da sede.
+
+| AGENCIA | NOME_AGENCIA |
+|---|---|
+| 1 | Pato Branco - Centro |
+| 2 | Pato Branco - Zona Norte |
+| 3 | Pato Branco - Zona Sul |
+| 4 | Pato Branco - PB Shopping |
+| 5 | Clevelândia - Centro |
+
+Fonte de verdade: `DIM_AGENCIA` (`src/config/settings.py`). Construída por `build_dim_agencia()` (`src/features/dimensoes.py`) e persistida por `run_gold()` (`src/pipeline.py`). Colunas `AGENCIA` (int64) e `NOME_AGENCIA` (string); relaciona-se com a fato diretamente pela coluna `AGENCIA` (mesmo padrão de `dim_calendario` — chave de negócio, não `*_ID` sintético).
 
 ## Observação sobre os dados
 

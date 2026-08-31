@@ -20,7 +20,7 @@ from src.config.settings import (
 )
 from src.features.calendario import build_dim_calendario
 from src.features.consolidado import build_dashboard_features, build_features
-from src.features.dimensoes import build_dimensions
+from src.features.dimensoes import build_dim_agencia, build_dimensions
 from src.io.excel import load_sources
 from src.utils.logging import get_logger
 
@@ -39,6 +39,7 @@ GOLD_DIM_PATHS = {
     "classificacao": GOLD_DIR / "dim_classificacao.parquet",
 }
 GOLD_DIM_CALENDARIO_PATH = GOLD_DIR / "dim_calendario.parquet"
+GOLD_DIM_AGENCIA_PATH = GOLD_DIR / "dim_agencia.parquet"
 
 
 def run_ingestion(file_path=RAW_ASSOCIADOS_PATH):
@@ -129,6 +130,7 @@ def run_gold(associados, produtos, movimentacao, reference_date):
     dashboard_features = build_dashboard_features(features)
     dimensions = build_dimensions()
     dim_calendario = build_dim_calendario(associados, reference_date)
+    dim_agencia = build_dim_agencia()
 
     GOLD_DIR.mkdir(parents=True, exist_ok=True)
     features.to_parquet(GOLD_FEATURES_PATH, index=False)
@@ -136,9 +138,10 @@ def run_gold(associados, produtos, movimentacao, reference_date):
     for name, dim in dimensions.items():
         dim.to_parquet(GOLD_DIM_PATHS[name], index=False)
     dim_calendario.to_parquet(GOLD_DIM_CALENDARIO_PATH, index=False)
+    dim_agencia.to_parquet(GOLD_DIM_AGENCIA_PATH, index=False)
 
     logger.info(
-        "Gold concluída: %s (%d linhas, %d colunas), %s (%d colunas), %d dimensões, %s (%d linhas)",
+        "Gold concluída: %s (%d linhas, %d colunas), %s (%d colunas), %d dimensões, %s (%d linhas), %s (%d linhas)",
         GOLD_FEATURES_PATH,
         len(features),
         len(features.columns),
@@ -147,6 +150,8 @@ def run_gold(associados, produtos, movimentacao, reference_date):
         len(dimensions),
         GOLD_DIM_CALENDARIO_PATH,
         len(dim_calendario),
+        GOLD_DIM_AGENCIA_PATH,
+        len(dim_agencia),
     )
     return features
 
