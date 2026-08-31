@@ -58,7 +58,7 @@ Cada achado é documentado com:
 **Implicação de negócio**: substitui a lógica de listas fixas por um ranking contínuo — em vez de decidir a priori os critérios de corte (ex.: "renda > R$15.000 E produtos ≤ 2"), a matriz deixa visível *onde* a combinação renda-alta/score-baixo é mais concentrada, e a tabela detalhada (ordenada de forma ascendente por `INDICE_CLASSIFICACAO`) já entrega os associados priorizados dentro dessa célula, com os cinco pilares `SCORE_*` como diagnóstico de composição (qual pilar está puxando o score para baixo).
 **Ação sugerida**: usar a célula "Acima de R$ 15.000" × "Inicial" como primeira lista de trabalho da área comercial — é o mesmo público de maior potencial de receita incremental identificado abaixo ("Alta renda e poucos produtos"), agora com um mecanismo de exploração interativo (clicar na célula da matriz filtra a tabela) em vez de uma lista estática.
 
-**Achado**: **538 associados (53,8%)** aparecem em pelo menos uma das três listas de oportunidade — mais da metade da carteira tem uma ação comercial objetivamente identificável.
+**Achado**: **533 associados (53,3%)** aparecem em pelo menos uma das três listas de oportunidade — mais da metade da carteira tem uma ação comercial objetivamente identificável.
 **Evidência**: `FLAG_OPORTUNIDADE_*` (Página 4), união das três flags.
 **Implicação de negócio**: o volume de oportunidades acionáveis é grande o suficiente para justificar uma rotina periódica de acompanhamento comercial dedicada a esta página, não um relatório eventual.
 **Ação sugerida**: definir um dono (área de relacionamento) e uma cadência (ex.: mensal) para trabalhar as três listas, priorizando pelo cruzamento abaixo.
@@ -73,7 +73,7 @@ Cada achado é documentado com:
 **Implicação de negócio**: mais de 1 em cada 3 associados de alta renda está subutilizado em produtos — é o segmento de maior potencial de receita incremental por associado (ticket médio mais alto), mesmo sendo o menor dos três grupos em volume.
 **Ação sugerida**: tratar como prioridade de valor (não de volume) — ofertas consultivas individualizadas de crédito/investimento, e não campanhas de massa.
 
-**Achado**: "Potencial de crescimento" soma **163 associados (16,3%)** — associados "Em Desenvolvimento" (2º quartil de engajamento) que já têm nível de movimentação Média ou Alta, ou seja, já são financeiramente ativos apesar de ainda terem poucos produtos.
+**Achado**: "Potencial de crescimento" soma **161 associados (16,1%)** — associados "Em Desenvolvimento" (2º quartil de engajamento) que já têm nível de movimentação Média ou Alta, ou seja, já são financeiramente ativos apesar de ainda terem poucos produtos.
 **Evidência**: `FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO`.
 **Implicação de negócio**: é o segmento com melhor relação esforço/retorno para cross-sell — o associado já demonstrou engajamento financeiro, falta apenas diversificar produtos.
 **Ação sugerida**: usar como lista prioritária para ofertas de segundo produto (ex.: cartão para quem só tem conta corrente), medindo taxa de conversão como indicador de sucesso da própria metodologia de classificação.

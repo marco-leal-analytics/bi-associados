@@ -84,31 +84,33 @@ FAIXAS_RENDA = (
     (3, 15_000, None),
 )
 
-# Faixas de TEMPO_RELACIONAMENTO_ANOS, em semestres (6 em 6 meses): (ID,
-# limite inferior exclusivo, limite superior inclusivo), ambos em meses. Ver
-# src/features/associados.py (add_faixa_tempo_relacionamento). MAX_SEMESTRES
-# = 18 cobre até 9 anos (108 meses) — folga sobre o máximo observado na base
-# atual (~8,7 anos, ver docs/qualidade_dados.md) sem gerar faixas vazias em
-# excesso; o último semestre fica aberto ("Acima de X meses") para não
-# quebrar se a base for regenerada com tempos de relacionamento maiores,
-# mesmo racional de CALENDARIO_ANOS_BUFFER para a Dim_Calendario.
+# Faixas de TEMPO_RELACIONAMENTO_ANOS, trienais (3 em 3 anos): (ID, limite
+# inferior exclusivo, limite superior inclusivo), ambos em meses. Ver
+# src/features/associados.py (add_faixa_tempo_relacionamento).
+# _MAX_FAIXAS_TEMPO_RELACIONAMENTO = 4 cobre até 9 anos (0-3, 3-6, 6-9) —
+# folga sobre o máximo observado na base atual (~8,7 anos, ver
+# docs/qualidade_dados.md); a última faixa fica aberta ("Acima de 9 anos")
+# para não quebrar se a base for regenerada com tempos de relacionamento
+# maiores, mesmo racional de CALENDARIO_ANOS_BUFFER para a Dim_Calendario.
 TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID = -1
-_MESES_POR_SEMESTRE = 6
-_MAX_SEMESTRES = 18
+_MESES_POR_FAIXA_TEMPO_RELACIONAMENTO = 36
+_MAX_FAIXAS_TEMPO_RELACIONAMENTO = 4
 
 FAIXAS_TEMPO_RELACIONAMENTO = tuple(
     (
         i,
-        i * _MESES_POR_SEMESTRE,
-        (i + 1) * _MESES_POR_SEMESTRE if i < _MAX_SEMESTRES - 1 else None,
+        i * _MESES_POR_FAIXA_TEMPO_RELACIONAMENTO,
+        (i + 1) * _MESES_POR_FAIXA_TEMPO_RELACIONAMENTO
+        if i < _MAX_FAIXAS_TEMPO_RELACIONAMENTO - 1
+        else None,
     )
-    for i in range(_MAX_SEMESTRES)
+    for i in range(_MAX_FAIXAS_TEMPO_RELACIONAMENTO)
 )
 
 DIM_TEMPO_RELACIONAMENTO = tuple(
     (
         id_,
-        f"{minimo} a {maximo} meses" if maximo is not None else f"Acima de {minimo} meses",
+        f"{minimo // 12} a {maximo // 12} anos" if maximo is not None else f"Acima de {minimo // 12} anos",
     )
     for id_, minimo, maximo in FAIXAS_TEMPO_RELACIONAMENTO
 ) + ((TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID, "Não disponível"),)

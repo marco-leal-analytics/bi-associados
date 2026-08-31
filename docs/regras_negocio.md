@@ -51,7 +51,7 @@ As regras sequenciais manuais descritas na primeira versão deste documento (top
 
 | Abordagem | Avaliação |
 |---|---|
-|
+| **Regras sequenciais manuais** (exemplo do desafio, top-down "primeira regra satisfeita vence") *(descartada)* | Simples de explicar e auditável linha a linha, mas as regras 1–4 exigem AND de 2–3 condições simultâneas e cobrem poucas combinações da base real — 83,1% dos associados caem na regra de fallback ("Em Desenvolvimento"), esvaziando o valor informativo da classificação para o gráfico de distribuição da Página 3. |
 | **Índice composto por percentil, com corte em quartis** *(adotada)* | Cada associado recebe uma pontuação de 0 a 1 combinando as dimensões pedidas no desafio (Produtos, Relacionamento, Saldo, Utilização — esta última desdobrada em Pix Mensal e Compras no Cartão, ver seção 5.2); a base inteira é então dividida em quartis dessa pontuação. Solução determinística entre execuções (sem aleatoriedade, sem variável-alvo a definir a priori), e por construção produz quatro grupos de tamanho comparável — resolvendo o desbalanceamento das regras sequenciais e sendo diretamente interpretável ao negócio. Avaliar com stakeholders, e verificar se alguma dimensão possui algum peso maior ou preferencial, isso produzirá estimativas e quebras de regra mais aderentes às estratégias da Cooperativa. |
 
 ### 5.2 Metodologia adotada — Índice de Classificação

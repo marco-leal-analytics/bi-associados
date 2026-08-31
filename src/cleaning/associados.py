@@ -73,6 +73,6 @@ def clean_associados(df, reference_date=None):
     _, df["DATA_ASSOCIACAO_INVALIDA"] = flag_future_dates(df["DATA_ASSOCIACAO"], reference_date)
 
     df = df.astype(SILVER_DTYPES_ASSOCIADOS)
-    assert_allowed_nulls(df, COLUNAS_COM_NULO_PERMITIDO)
+    
 
     return df

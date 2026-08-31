@@ -78,7 +78,7 @@ def add_faixa_renda(df):
 
 
 def add_faixa_tempo_relacionamento(df):
-    """Classifica `TEMPO_RELACIONAMENTO_ANOS` em semestres (`FAIXAS_TEMPO_RELACIONAMENTO`), como ID.
+    """Classifica `TEMPO_RELACIONAMENTO_ANOS` em faixas trienais (`FAIXAS_TEMPO_RELACIONAMENTO`), como ID.
 
     Registros com `TEMPO_RELACIONAMENTO_ANOS` nulo (associados com
     `DATA_ASSOCIACAO_INVALIDA`, ver `add_indicadores_relacionamento`)

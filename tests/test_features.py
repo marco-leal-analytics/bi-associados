@@ -156,8 +156,11 @@ def test_faixa_renda_id_limites_consistentes(associados_faixa_renda):
 
 
 def test_faixa_tempo_relacionamento_id_dominio(associados_faixa_tempo_relacionamento):
+    # Subconjunto, não igualdade: a última faixa (aberta) é folga para tempos
+    # de relacionamento maiores que o observado hoje na base (mesmo racional
+    # de CALENDARIO_ANOS_BUFFER) e pode não estar populada na base atual.
     esperado = {id_ for id_, _, _ in FAIXAS_TEMPO_RELACIONAMENTO} | {TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID}
-    assert set(associados_faixa_tempo_relacionamento["TEMPO_RELACIONAMENTO_FAIXA_ID"].dropna().unique()) == esperado
+    assert set(associados_faixa_tempo_relacionamento["TEMPO_RELACIONAMENTO_FAIXA_ID"].dropna().unique()) <= esperado
 
 
 def test_faixa_tempo_relacionamento_id_nao_disponivel_em_data_invalida(associados_faixa_tempo_relacionamento):

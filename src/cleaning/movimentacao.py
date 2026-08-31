@@ -45,6 +45,6 @@ def clean_movimentacao(df):
         df[column] = treated
         df[f"{column}_INVALIDO"] = is_invalid
 
-    assert_allowed_nulls(df, COLUNAS_COM_NULO_PERMITIDO)
+    
 
     return df

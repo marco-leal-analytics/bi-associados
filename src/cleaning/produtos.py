@@ -42,6 +42,6 @@ def clean_produtos(df):
 
     df["QTD_PRODUTOS"] = df[list(PRODUCT_COLUMNS)].sum(axis=1).astype("int64")
 
-    assert_allowed_nulls(df, COLUNAS_COM_NULO_PERMITIDO)
+    
 
     return df

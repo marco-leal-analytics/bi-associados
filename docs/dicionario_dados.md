@@ -74,7 +74,7 @@ Gerados por `run_silver()` (`src/pipeline.py`), que aplica `clean_associados`/`c
 
 ## 5. Campos Derivados (Gold / Features)
 
-`data/2_gold/features.parquet` (tabela fato): as três entidades Silver consolidadas pela `CHAVE` (`build_features`, `src/features/consolidado.py`; `validate="one_to_one"` em cada `merge`, impondo a cardinalidade 1:1:1 da seção "Chave de integração") mais os campos abaixo, calculados em sequência (produtos/relacionamento → nível de movimentação → classificação → flags de oportunidade). 1000 linhas × 39 colunas. Metodologia e limiares completos em `regras_negocio.md`.
+`data/2_gold/features.parquet` (tabela fato): as três entidades Silver consolidadas pela `CHAVE` (`build_features`, `src/features/consolidado.py`; `validate="one_to_one"` em cada `merge`, impondo a cardinalidade 1:1:1 da seção "Chave de integração") mais os campos abaixo, calculados em sequência (produtos/relacionamento → nível de movimentação → classificação → flags de oportunidade). 1000 linhas × 41 colunas. Metodologia e limiares completos em `regras_negocio.md`.
 
 **Modelagem em estrela**: toda faixa/classe/classificação criada nesta etapa é gravada na fato como um **ID inteiro**, não como texto — o rótulo correspondente vive numa tabela de dimensão separada (seção 6), relacionada pelo ID no Power BI. Isso evita repetir a mesma string em cada uma das 1000 linhas da fato, reduzindo o tamanho do arquivo.
 
@@ -93,7 +93,7 @@ Gerados por `run_silver()` (`src/pipeline.py`), que aplica `clean_associados`/`c
 | TEMPO_RELACIONAMENTO_DIAS | DATA_REFERENCIA − DATA_ASSOCIACAO | Int64 (nulo se DATA_ASSOCIACAO_INVALIDA) | Dias desde a associação |
 | TEMPO_RELACIONAMENTO_ANOS | TEMPO_RELACIONAMENTO_DIAS / 365,25 | Float64 (nulo se DATA_ASSOCIACAO_INVALIDA) | Anos de relacionamento, arredondado a 2 casas |
 | FAIXA_RENDA_ID | Faixa de RENDA_MENSAL (`FAIXAS_RENDA`) | int64 (0–3 ou -1) | FK para `dim_faixa_renda` (seção 6.1); -1 quando RENDA_MENSAL é nula ("Não informado") |
-| TEMPO_RELACIONAMENTO_FAIXA_ID | Faixa semestral (6 em 6 meses) de TEMPO_RELACIONAMENTO_ANOS (`FAIXAS_TEMPO_RELACIONAMENTO`) | int64 (0–17 ou -1) | FK para `dim_tempo_relacionamento` (seção 6.2); -1 quando TEMPO_RELACIONAMENTO_ANOS é nulo ("Não disponível", mesmos 37 registros de DATA_ASSOCIACAO_INVALIDA) |
+| TEMPO_RELACIONAMENTO_FAIXA_ID | Faixa trienal (3 em 3 anos) de TEMPO_RELACIONAMENTO_ANOS (`FAIXAS_TEMPO_RELACIONAMENTO`) | int64 (0–3 ou -1) | FK para `dim_tempo_relacionamento` (seção 6.2); -1 quando TEMPO_RELACIONAMENTO_ANOS é nulo ("Não disponível", mesmos 37 registros de DATA_ASSOCIACAO_INVALIDA) |
 
 ### 5.3 Nível de movimentação (`src/features/movimentacao.py`)
 
@@ -129,7 +129,7 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 
 ### 5.6 Tabela reduzida para o Power BI (`features_dashboard.parquet`)
 
-`data/2_gold/features_dashboard.parquet`: projeção de `features.parquet` (seção 5) só com as colunas que alimentam algum visual das 4 páginas do dashboard (`regras_negocio.md`, seção 7), gerada por `build_dashboard_features` (`src/features/consolidado.py`) a partir de `DASHBOARD_COLUMNS` (`src/config/settings.py`) e persistida por `run_gold` (`src/pipeline.py`). 1000 linhas × 22 colunas, contra 41 colunas da fato completa — os campos deixados de fora são intermediários de cálculo sem visual próprio (níveis individuais de movimentação, colunas de produto por tipo, flags `*_INVALIDO` de qualidade). `INDICE_CLASSIFICACAO` e os cinco pilares `SCORE_*` são exceção incluída propositalmente para a Página 4: a matriz Renda × Classificação usa `INDICE_CLASSIFICACAO` (rotulado no Power BI como "Score de Utilização de Produtos") como valor — quanto menor o score, maior a oportunidade — e a tabela detalhada de associados traz os `SCORE_*` individuais como informação auxiliar de composição, ordenada de forma ascendente pelo mesmo índice. Esta é a tabela recomendada para o import no Power BI (junto das cinco dimensões `dim_*_id`, da `dim_calendario` e da `dim_agencia`, seção 6); `features.parquet` continua disponível como fato completa/auditável.
+`data/2_gold/features_dashboard.parquet`: projeção de `features.parquet` (seção 5) só com as colunas que alimentam algum visual das 4 páginas do dashboard (`regras_negocio.md`, seção 7), gerada por `build_dashboard_features` (`src/features/consolidado.py`) a partir de `DASHBOARD_COLUMNS` (`src/config/settings.py`) e persistida por `run_gold` (`src/pipeline.py`). 1000 linhas × 19 colunas, contra 41 colunas da fato completa — os campos deixados de fora são intermediários de cálculo sem visual próprio (níveis individuais de movimentação, colunas de produto por tipo, flags `*_INVALIDO` de qualidade e as três `FLAG_OPORTUNIDADE_*`, seção 5.5 — substituídas na Página 4 pela matriz Renda × Classificação abaixo; permanecem disponíveis em `features.parquet` para quem preferir os critérios fixos). `INDICE_CLASSIFICACAO` e os cinco pilares `SCORE_*` são exceção incluída propositalmente para a Página 4: a matriz Renda × Classificação usa `INDICE_CLASSIFICACAO` (rotulado no Power BI como "Score de Utilização de Produtos") como valor — quanto menor o score, maior a oportunidade — e a tabela detalhada de associados traz os `SCORE_*` individuais como informação auxiliar de composição, ordenada de forma ascendente pelo mesmo índice. Esta é a tabela recomendada para o import no Power BI (junto das cinco dimensões `dim_*_id`, da `dim_calendario` e da `dim_agencia`, seção 6); `features.parquet` continua disponível como fato completa/auditável.
 
 | Coluna | Página que usa | Papel |
 |---|---|---|
@@ -152,9 +152,8 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 | SCORE_PIX_MENSAL | Página 4 | Pilar "Pix Mensal" do índice — informação auxiliar de composição |
 | SCORE_COMPRAS_CARTAO | Página 4 | Pilar "Compras no Cartão" do índice — informação auxiliar de composição |
 | CLASSIFICACAO_TEMPO_INDISPONIVEL | Página 3 (transparência) | Sinaliza score de relacionamento neutralizado |
-| FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS | Página 4 | Lista de oportunidade |
-| FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO | Página 4 | Lista de oportunidade |
-| FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO | Página 4 | Lista de oportunidade |
+
+As três `FLAG_OPORTUNIDADE_*` (seção 5.5) não entram em `features_dashboard.parquet` — a Página 4 usa a matriz Renda × Classificação sobre `INDICE_CLASSIFICACAO` no lugar de listas por flag (ver "Metodologia de identificação de oportunidades" no `README.md`, item 12.02, e `regras_negocio.md`, seção 7). As colunas de flag continuam disponíveis em `features.parquet` para quem preferir os critérios fixos.
 
 ## 6. Dimensões (Gold)
 
@@ -172,28 +171,14 @@ Tabelas auxiliares de de-para ID → descrição, construídas por `build_dimens
 
 ### 6.2 `dim_tempo_relacionamento.parquet`
 
-Faixas semestrais (6 em 6 meses) de `TEMPO_RELACIONAMENTO_ANOS`, cobrindo até 9 anos (108 meses) — folga sobre o máximo observado na base atual (~8,7 anos). Fonte de verdade: `DIM_TEMPO_RELACIONAMENTO`/`FAIXAS_TEMPO_RELACIONAMENTO` (`src/config/settings.py`). Calculada por `add_faixa_tempo_relacionamento` (`src/features/associados.py`) a partir de `TEMPO_RELACIONAMENTO_ANOS` já em meses.
+Faixas trienais (3 em 3 anos) de `TEMPO_RELACIONAMENTO_ANOS`, cobrindo até 9 anos — folga sobre o máximo observado na base atual (~8,7 anos). Fonte de verdade: `DIM_TEMPO_RELACIONAMENTO`/`FAIXAS_TEMPO_RELACIONAMENTO` (`src/config/settings.py`). Calculada por `add_faixa_tempo_relacionamento` (`src/features/associados.py`) a partir de `TEMPO_RELACIONAMENTO_ANOS` convertido para meses; a última faixa ("Acima de 9 anos") é folga para reexecuções futuras e pode não ter nenhum associado na base atual, mesmo racional de `CALENDARIO_ANOS_BUFFER` para a `dim_calendario`.
 
 | ID | DESCRICAO |
 |---|---|
-| 0 | 0 a 6 meses |
-| 1 | 6 a 12 meses |
-| 2 | 12 a 18 meses |
-| 3 | 18 a 24 meses |
-| 4 | 24 a 30 meses |
-| 5 | 30 a 36 meses |
-| 6 | 36 a 42 meses |
-| 7 | 42 a 48 meses |
-| 8 | 48 a 54 meses |
-| 9 | 54 a 60 meses |
-| 10 | 60 a 66 meses |
-| 11 | 66 a 72 meses |
-| 12 | 72 a 78 meses |
-| 13 | 78 a 84 meses |
-| 14 | 84 a 90 meses |
-| 15 | 90 a 96 meses |
-| 16 | 96 a 102 meses |
-| 17 | Acima de 102 meses |
+| 0 | 0 a 3 anos |
+| 1 | 3 a 6 anos |
+| 2 | 6 a 9 anos |
+| 3 | Acima de 9 anos |
 | -1 | Não disponível |
 
 ### 6.3 `dim_nivel_diversificacao.parquet`
