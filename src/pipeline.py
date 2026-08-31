@@ -19,6 +19,7 @@ from src.config.settings import (
     SILVER_DIR,
 )
 from src.features.consolidado import build_features
+from src.features.dimensoes import build_dimensions
 from src.io.excel import load_sources
 from src.utils.logging import get_logger
 
@@ -29,6 +30,12 @@ SILVER_PRODUTOS_PATH = SILVER_DIR / "produtos.parquet"
 SILVER_MOVIMENTACAO_PATH = SILVER_DIR / "movimentacao.parquet"
 
 GOLD_FEATURES_PATH = GOLD_DIR / "features.parquet"
+GOLD_DIM_PATHS = {
+    "faixa_renda": GOLD_DIR / "dim_faixa_renda.parquet",
+    "nivel_diversificacao": GOLD_DIR / "dim_nivel_diversificacao.parquet",
+    "nivel_movimentacao": GOLD_DIR / "dim_nivel_movimentacao.parquet",
+    "classificacao": GOLD_DIR / "dim_classificacao.parquet",
+}
 
 
 def run_ingestion(file_path=RAW_ASSOCIADOS_PATH):
@@ -107,16 +114,21 @@ def run_gold(associados, produtos, movimentacao, reference_date):
 
     Returns:
         `DataFrame` Gold consolidado (uma linha por `CHAVE`), o mesmo
-        conteúdo persistido em `GOLD_FEATURES_PATH`.
+        conteúdo persistido em `GOLD_FEATURES_PATH`. As tabelas de
+        dimensão (`dim_*.parquet`, ver `GOLD_DIM_PATHS`) são persistidas
+        como efeito colateral, mas não fazem parte do retorno.
     """
     logger.info("Gold iniciada (DATA_REFERENCIA=%s)", reference_date.date())
 
     features = build_features(associados, produtos, movimentacao, reference_date=reference_date)
+    dimensions = build_dimensions()
 
     GOLD_DIR.mkdir(parents=True, exist_ok=True)
     features.to_parquet(GOLD_FEATURES_PATH, index=False)
+    for name, dim in dimensions.items():
+        dim.to_parquet(GOLD_DIM_PATHS[name], index=False)
 
-    logger.info("Gold concluída: %s (%d linhas)", GOLD_FEATURES_PATH, len(features))
+    logger.info("Gold concluída: %s (%d linhas), %d dimensões", GOLD_FEATURES_PATH, len(features), len(dimensions))
     return features
 
 

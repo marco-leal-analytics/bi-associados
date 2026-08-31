@@ -71,7 +71,7 @@ Levantado sobre `data/0_bronze/raw_associados.xlsx` (1000 registros por planilha
 | Completude de categorias | `CIDADE` com exatamente as categorias canônicas esperadas (nenhuma variante remanescente) |
 | Nulos residuais | Apenas os campos com decisão explícita de manter nulo (ex.: `RENDA_MENSAL` não imputada) — qualquer nulo fora da lista aprovada reprova a validação |
 | Datas | Nenhuma `TEMPO_RELACIONAMENTO_ANOS` negativa na base final (registros inválidos tratados conforme regra acima) |
-| Domínio dos derivados | `QTD_PRODUTOS` ∈ [0,6]; `FAIXA_RENDA`, `NIVEL_MOVIMENTACAO`, `CLASSIFICACAO` sempre preenchidos com um valor do domínio definido em `regras_negocio.md` (sem categoria "Outro"/residual) |
+| Domínio dos derivados | `QTD_PRODUTOS` ∈ [0,6]; `FAIXA_RENDA_ID`, `NIVEL_MOVIMENTACAO_ID`, `CLASSIFICACAO_ID` sempre preenchidos com um ID existente na respectiva dimensão (`dim_*.parquet`, ver `dicionario_dados.md` seção 6) — sem ID órfão/residual |
 | Contagem de linhas | Base Gold com o mesmo número de associados da base Bronze (1000), salvo exclusão documentada e justificada |
 
 ### 5.1 Resultado observado (pipeline implementado)
@@ -86,7 +86,7 @@ Todas as regras acima são hoje impostas em tempo de execução — via `ValueEr
 | `DATA_ASSOCIACAO_INVALIDA` | 37 registros sinalizados (mesmos 37 da avaliação Bronze, seção 2) |
 | `*_INVALIDO` (Movimentacao) | 0 registros sinalizados em `SALDO_MEDIO_INVALIDO`, `PIX_MENSAL_INVALIDO` e `COMPRAS_CARTAO_INVALIDO` — nenhum valor negativo na base real, regra preventiva sem ocorrência |
 | `QTD_PRODUTOS` | Intervalo observado 0–6, dentro do domínio esperado |
-| `FAIXA_RENDA = "Não informado"` | 12 registros (os mesmos de `RENDA_MENSAL` nula) |
+| `FAIXA_RENDA_ID = -1` ("Não informado") | 12 registros (os mesmos de `RENDA_MENSAL` nula) |
 | `CLASSIFICACAO_TEMPO_INDISPONIVEL` | 37 registros (os mesmos de `DATA_ASSOCIACAO_INVALIDA`) |
 | Contagem de linhas | 1000 em cada Silver (Associados, Produtos, Movimentacao) e 1000 na Gold — nenhuma perda no `merge` pela `CHAVE` |
 

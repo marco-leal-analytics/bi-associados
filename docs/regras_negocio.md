@@ -29,7 +29,7 @@ Faixas fixas definidas no desafio técnico (não são quartis calculados, são o
 
 Registros com `RENDA_MENSAL` nula não recebem faixa (categoria "Não informado") e são excluídos do denominador em análises percentuais de renda.
 
-Na implementação (`FAIXAS_RENDA`, `src/config/settings.py`), cada rótulo leva um prefixo alfabético — `"A - Até R$ 3.000"`, `"B - R$ 3.001 a R$ 8.000"`, `"C - R$ 8.001 a R$ 15.000"`, `"D - Acima de R$ 15.000"` — apenas para ordenar as faixas corretamente no Power BI; os intervalos e a regra de negócio são os mesmos da tabela acima.
+Na implementação, a Gold não grava o rótulo da faixa em texto: `FAIXA_RENDA_ID` guarda o ID (0 a 3, na mesma ordem da tabela acima; -1 para "Não informado") e o rótulo vive na dimensão `dim_faixa_renda.parquet` (`DIM_FAIXA_RENDA`, `src/config/settings.py`; ver `dicionario_dados.md`, seção 6.1) — os intervalos e a regra de negócio são os mesmos da tabela acima, só a representação física muda (ID em vez de string, reduzindo o tamanho da fato).
 
 ## 4. Nível de Movimentação (indicador de apoio à classificação)
 
@@ -69,11 +69,11 @@ Cada associado recebe uma pontuação por **percentil (rank percentual, 0 a 1)**
 
 Associados com `TEMPO_RELACIONAMENTO_ANOS` nulo (data futura inválida, 37 registros — ver seção 2) recebem `SCORE_RELACIONAMENTO = 0,5` (mediana neutra), para não penalizar nem favorecer artificialmente o índice, com sinalização `CLASSIFICACAO_TEMPO_INDISPONIVEL = True` para transparência no dashboard — mesma lógica de transparência já usada em `DATA_ASSOCIACAO_INVALIDA`.
 
-`CLASSIFICACAO` é obtida dividindo `INDICE_CLASSIFICACAO` em quartis (25% cada), rotulados em ordem crescente de pontuação, do domínio `CLASSIFICACAO_LABELS`:
+`CLASSIFICACAO` é obtida dividindo `INDICE_CLASSIFICACAO` em quartis (25% cada), rotulados em ordem crescente de pontuação, do domínio `DIM_CLASSIFICACAO`:
 
 **Inicial** (Q1) → **Em Desenvolvimento** (Q2) → **Maduro** (Q3) → **Engajado** (Q4)
 
-Na implementação, cada rótulo leva um prefixo alfabético — `"A - Inicial"`, `"B - Em Desenvolvimento"`, `"C - Maduro"`, `"D - Engajado"` — apenas para ordenar as categorias corretamente no Power BI, mesmo padrão de `FAIXA_RENDA` (seção 3).
+Na implementação, `CLASSIFICACAO_ID` guarda o ID de 0 (Inicial) a 3 (Engajado) — mesma ordem de negócio da lista acima — e o rótulo vive na dimensão `dim_classificacao.parquet` (`DIM_CLASSIFICACAO`, `src/config/settings.py`; ver `dicionario_dados.md`, seção 6.4), mesmo padrão de `FAIXA_RENDA_ID` (seção 3).
 
 ### 5.3 Validação sobre a base Gold real
 
@@ -88,13 +88,13 @@ Sobre os mesmos 1000 registros: distribuição exatamente 250/250/250/250 entre 
 
 ## 6. Critérios de Oportunidade
 
-| Oportunidade | Critério | Coluna na Gold |
-|---|---|---|
-| Alta renda e poucos produtos | FAIXA_RENDA = "Acima de R$ 15.000" **E** QTD_PRODUTOS ≤ 2 | `FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS` |
-| Baixa utilização dos serviços | NIVEL_MOVIMENTACAO = Baixa **E** QTD_PRODUTOS ≥ 2 (já é cliente, mas pouco ativo — diferente de "Inicial") | `FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO` |
-| Potencial de crescimento | CLASSIFICACAO = "Em Desenvolvimento" **E** NIVEL_MOVIMENTACAO ∈ {Média, Alta} (produtos ainda poucos, mas já engajado financeiramente) | `FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO` |
+| Oportunidade | Critério (rótulo de negócio) | Critério (implementação, por ID) | Coluna na Gold |
+|---|---|---|---|
+| Alta renda e poucos produtos | FAIXA_RENDA = "Acima de R$ 15.000" **E** QTD_PRODUTOS ≤ 2 | `FAIXA_RENDA_ID = 3` **E** `QTD_PRODUTOS ≤ 2` | `FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS` |
+| Baixa utilização dos serviços | NIVEL_MOVIMENTACAO = Baixa **E** QTD_PRODUTOS ≥ 2 (já é cliente, mas pouco ativo — diferente de "Inicial") | `NIVEL_MOVIMENTACAO_ID = 0` **E** `QTD_PRODUTOS ≥ 2` | `FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO` |
+| Potencial de crescimento | CLASSIFICACAO = "Em Desenvolvimento" **E** NIVEL_MOVIMENTACAO ∈ {Média, Alta} (produtos ainda poucos, mas já engajado financeiramente) | `CLASSIFICACAO_ID = 1` **E** `NIVEL_MOVIMENTACAO_ID ∈ {1, 2}` | `FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO` |
 
-Essas flags não são mutuamente exclusivas: um associado pode aparecer em mais de uma lista de oportunidade simultaneamente. Implementadas em `add_flags_oportunidade` (`src/features/oportunidades.py`), parametrizadas em `OPORTUNIDADE_*` (`src/config/settings.py`) — nesses parâmetros, `FAIXA_RENDA` e `CLASSIFICACAO` usam os rótulos prefixados da implementação (`"D - Acima de R$ 15.000"`, `"B - Em Desenvolvimento"`, ver seções 3 e 5.2), não o texto simplificado desta tabela.
+Essas flags não são mutuamente exclusivas: um associado pode aparecer em mais de uma lista de oportunidade simultaneamente. Implementadas em `add_flags_oportunidade` (`src/features/oportunidades.py`), parametrizadas em `OPORTUNIDADE_*` (`src/config/settings.py`) — esses parâmetros comparam diretamente os IDs das dimensões (seções 3, 4 e 5.2; `dicionario_dados.md`, seção 6), não texto.
 
 ## 7. Uso nas páginas do Power BI
 

@@ -1,12 +1,11 @@
 """Indicadores derivados da entidade Associados: tempo de relacionamento e
-faixa de renda. Ver `docs/regras_negocio.md` (seções 2 e 3).
+faixa (ID) de renda. Ver `docs/regras_negocio.md` (seções 2 e 3) e a
+dimensão `DIM_FAIXA_RENDA` (`src/config/settings.py`).
 """
 
 import pandas as pd
 
-from src.config.settings import DIAS_POR_ANO, FAIXAS_RENDA
-
-FAIXA_RENDA_NAO_INFORMADO = "Não informado"
+from src.config.settings import DIAS_POR_ANO, FAIXA_RENDA_NAO_INFORMADO_ID, FAIXAS_RENDA
 
 
 def add_indicadores_relacionamento(df, reference_date=None):
@@ -46,27 +45,27 @@ def add_indicadores_relacionamento(df, reference_date=None):
 
 
 def add_faixa_renda(df):
-    """Classifica `RENDA_MENSAL` em faixas fixas (`FAIXAS_RENDA`).
+    """Classifica `RENDA_MENSAL` em faixas fixas (`FAIXAS_RENDA`), como ID.
 
-    Registros com `RENDA_MENSAL` nula recebem a categoria
-    `FAIXA_RENDA_NAO_INFORMADO` em vez de serem excluídos ou imputados
-    (ver `docs/regras_negocio.md`, seção 3).
+    Registros com `RENDA_MENSAL` nula recebem `FAIXA_RENDA_NAO_INFORMADO_ID`
+    em vez de serem excluídos ou imputados (ver `docs/regras_negocio.md`,
+    seção 3). O rótulo de cada ID vive em `DIM_FAIXA_RENDA`
+    (`src/config/settings.py`), não nesta coluna.
 
     Args:
         df: `DataFrame` com a coluna `RENDA_MENSAL`.
 
     Returns:
-        Cópia de `df` com `FAIXA_RENDA` adicionada (categórica, rótulos
-        de `FAIXAS_RENDA` mais `FAIXA_RENDA_NAO_INFORMADO`).
+        Cópia de `df` com `FAIXA_RENDA_ID` (int) adicionada.
     """
     df = df.copy()
 
-    labels, _, maximos = zip(*FAIXAS_RENDA)
+    ids, _, maximos = zip(*FAIXAS_RENDA)
     bins = [0, *maximos[:-1], float("inf")]
 
-    faixa = pd.cut(df["RENDA_MENSAL"], bins=bins, labels=labels, include_lowest=True)
-    df["FAIXA_RENDA"] = faixa.cat.add_categories([FAIXA_RENDA_NAO_INFORMADO]).fillna(
-        FAIXA_RENDA_NAO_INFORMADO
-    )
+    faixa = pd.cut(df["RENDA_MENSAL"], bins=bins, labels=ids, include_lowest=True)
+    df["FAIXA_RENDA_ID"] = faixa.cat.add_categories([FAIXA_RENDA_NAO_INFORMADO_ID]).fillna(
+        FAIXA_RENDA_NAO_INFORMADO_ID
+    ).astype("int64")
 
     return df

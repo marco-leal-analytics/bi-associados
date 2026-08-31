@@ -39,7 +39,12 @@ def build_features(associados, produtos, movimentacao, reference_date=None):
     Returns:
         `DataFrame` Gold com uma linha por `CHAVE`, contendo os campos
         originais das três entidades mais todos os indicadores derivados
-        e `CLASSIFICACAO`/`FLAG_OPORTUNIDADE_*`.
+        e `CLASSIFICACAO_ID`/`FLAG_OPORTUNIDADE_*`. As faixas/classes
+        derivadas ficam como ID inteiro (`FAIXA_RENDA_ID`,
+        `NIVEL_DIVERSIFICACAO_ID`, `NIVEL_MOVIMENTACAO_ID`,
+        `CLASSIFICACAO_ID`) — o rótulo de cada uma vive nas tabelas de
+        dimensão (`src/features/dimensoes.py`, `build_dimensions`),
+        persistidas separadamente por `run_gold` (`src/pipeline.py`).
 
     Raises:
         pandas.errors.MergeError: Se a cardinalidade 1:1:1 pela `CHAVE`

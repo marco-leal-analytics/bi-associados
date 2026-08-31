@@ -74,7 +74,9 @@ Gerados por `run_silver()` (`src/pipeline.py`), que aplica `clean_associados`/`c
 
 ## 5. Campos Derivados (Gold / Features)
 
-`data/2_gold/features.parquet`: as três entidades Silver consolidadas pela `CHAVE` (`build_features`, `src/features/consolidado.py`; `validate="one_to_one"` em cada `merge`, impondo a cardinalidade 1:1:1 da seção "Chave de integração") mais os campos abaixo, calculados em sequência (produtos/relacionamento → nível de movimentação → classificação → flags de oportunidade). 1000 linhas × 39 colunas. Metodologia e limiares completos em `regras_negocio.md`.
+`data/2_gold/features.parquet` (tabela fato): as três entidades Silver consolidadas pela `CHAVE` (`build_features`, `src/features/consolidado.py`; `validate="one_to_one"` em cada `merge`, impondo a cardinalidade 1:1:1 da seção "Chave de integração") mais os campos abaixo, calculados em sequência (produtos/relacionamento → nível de movimentação → classificação → flags de oportunidade). 1000 linhas × 39 colunas. Metodologia e limiares completos em `regras_negocio.md`.
+
+**Modelagem em estrela**: toda faixa/classe/classificação criada nesta etapa é gravada na fato como um **ID inteiro**, não como texto — o rótulo correspondente vive numa tabela de dimensão separada (seção 6), relacionada pelo ID no Power BI. Isso evita repetir a mesma string em cada uma das 1000 linhas da fato, reduzindo o tamanho do arquivo.
 
 ### 5.1 Indicadores de produtos (`src/features/produtos.py`)
 
@@ -82,7 +84,7 @@ Gerados por `run_silver()` (`src/pipeline.py`), que aplica `clean_associados`/`c
 |---|---|---|---|
 | QTD_PRODUTOS | Contagem de "S" entre CONTA_CORRENTE, CARTAO, CREDITO, INVESTIMENTO, CONSORCIO, SEGURO | int (0–6) | Total de produtos ativos por associado (já calculado na Silver, seção 2) |
 | INDICE_DIVERSIFICACAO | QTD_PRODUTOS / total de produtos possíveis (6) | float (0–1) | Proporção de produtos possuídos sobre o total |
-| NIVEL_DIVERSIFICACAO | Faixas de QTD_PRODUTOS (`FAIXAS_DIVERSIFICACAO`) | category (ordenada) | "0 - Baixa" / "1 - Média" / "2 - Alta" (prefixo numérico para ordenação no Power BI) |
+| NIVEL_DIVERSIFICACAO_ID | Faixas de QTD_PRODUTOS (`FAIXAS_DIVERSIFICACAO`) | int64 (0–2) | FK para `dim_nivel_diversificacao` (seção 6.2) |
 
 ### 5.2 Tempo de relacionamento e faixa de renda (`src/features/associados.py`)
 
@@ -90,16 +92,16 @@ Gerados por `run_silver()` (`src/pipeline.py`), que aplica `clean_associados`/`c
 |---|---|---|---|
 | TEMPO_RELACIONAMENTO_DIAS | DATA_REFERENCIA − DATA_ASSOCIACAO | Int64 (nulo se DATA_ASSOCIACAO_INVALIDA) | Dias desde a associação |
 | TEMPO_RELACIONAMENTO_ANOS | TEMPO_RELACIONAMENTO_DIAS / 365,25 | Float64 (nulo se DATA_ASSOCIACAO_INVALIDA) | Anos de relacionamento, arredondado a 2 casas |
-| FAIXA_RENDA | Faixa de RENDA_MENSAL (`FAIXAS_RENDA`) | category | "A - Até R$ 3.000" / "B - R$ 3.001 a R$ 8.000" / "C - R$ 8.001 a R$ 15.000" / "D - Acima de R$ 15.000" / "Não informado" (RENDA_MENSAL nula) |
+| FAIXA_RENDA_ID | Faixa de RENDA_MENSAL (`FAIXAS_RENDA`) | int64 (0–3 ou -1) | FK para `dim_faixa_renda` (seção 6.1); -1 quando RENDA_MENSAL é nula ("Não informado") |
 
 ### 5.3 Nível de movimentação (`src/features/movimentacao.py`)
 
 | Campo derivado | Fórmula / origem | Tipo | Descrição |
 |---|---|---|---|
-| NIVEL_SALDO_MEDIO | Tercis de SALDO_MEDIO (`TERCIS_MOVIMENTACAO`) | category (ordenada) | Baixa / Média / Alta — classificação individual, antes da moda |
-| NIVEL_PIX_MENSAL | Tercis de PIX_MENSAL | category (ordenada) | Idem, sobre PIX_MENSAL |
-| NIVEL_COMPRAS_CARTAO | Tercis de COMPRAS_CARTAO | category (ordenada) | Idem, sobre COMPRAS_CARTAO |
-| NIVEL_MOVIMENTACAO | Moda entre NIVEL_SALDO_MEDIO, NIVEL_PIX_MENSAL e NIVEL_COMPRAS_CARTAO; desempate por NIVEL_SALDO_MEDIO | category (ordenada) | Baixa / Média / Alta — nível final do associado |
+| NIVEL_SALDO_MEDIO_ID | Tercis de SALDO_MEDIO (`TERCIS_MOVIMENTACAO`) | int64 (0–2) | FK para `dim_nivel_movimentacao` (seção 6.3) — classificação individual, antes da moda |
+| NIVEL_PIX_MENSAL_ID | Tercis de PIX_MENSAL | int64 (0–2) | Idem, sobre PIX_MENSAL |
+| NIVEL_COMPRAS_CARTAO_ID | Tercis de COMPRAS_CARTAO | int64 (0–2) | Idem, sobre COMPRAS_CARTAO |
+| NIVEL_MOVIMENTACAO_ID | Moda entre NIVEL_SALDO_MEDIO_ID, NIVEL_PIX_MENSAL_ID e NIVEL_COMPRAS_CARTAO_ID; desempate por NIVEL_SALDO_MEDIO_ID | int64 (0–2) | FK para `dim_nivel_movimentacao` — nível final do associado |
 
 ### 5.4 Classificação (`src/features/classificacao.py`)
 
@@ -111,7 +113,7 @@ Gerados por `run_silver()` (`src/pipeline.py`), que aplica `clean_associados`/`c
 | SCORE_UTILIZACAO | Média dos percentis de PIX_MENSAL e COMPRAS_CARTAO | float (0–1) | Pilar "Utilização" |
 | CLASSIFICACAO_TEMPO_INDISPONIVEL | True quando TEMPO_RELACIONAMENTO_ANOS é nulo (SCORE_RELACIONAMENTO neutralizado) | bool | Sinalização de transparência — mesma lógica de DATA_ASSOCIACAO_INVALIDA |
 | INDICE_CLASSIFICACAO | Soma ponderada dos quatro SCORE_* (`CLASSIFICACAO_PESOS`, 25% cada por padrão) | Float64 (0–1) | Índice composto de classificação |
-| CLASSIFICACAO | INDICE_CLASSIFICACAO cortado em quartis (`CLASSIFICACAO_LABELS`) | category (ordenada) | "A - Inicial" / "B - Em Desenvolvimento" / "C - Maduro" / "D - Engajado" (prefixo alfabético para ordenação no Power BI) |
+| CLASSIFICACAO_ID | INDICE_CLASSIFICACAO cortado em quartis (`DIM_CLASSIFICACAO`) | int64 (0–3) | FK para `dim_classificacao` (seção 6.4) |
 
 ### 5.5 Flags de oportunidade (`src/features/oportunidades.py`)
 
@@ -119,9 +121,52 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 
 | Campo derivado | Fórmula / origem | Tipo | Descrição |
 |---|---|---|---|
-| FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS | FAIXA_RENDA = "D - Acima de R$ 15.000" E QTD_PRODUTOS ≤ 2 | bool | Alta renda, mas poucos produtos contratados |
-| FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO | NIVEL_MOVIMENTACAO = Baixa E QTD_PRODUTOS ≥ 2 | bool | Já é cliente de mais de um produto, mas pouco ativo |
-| FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO | CLASSIFICACAO = "B - Em Desenvolvimento" E NIVEL_MOVIMENTACAO ∈ {Média, Alta} | bool | Poucos produtos, mas já engajado financeiramente |
+| FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS | FAIXA_RENDA_ID = 3 ("Acima de R$ 15.000") E QTD_PRODUTOS ≤ 2 | bool | Alta renda, mas poucos produtos contratados |
+| FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO | NIVEL_MOVIMENTACAO_ID = 0 ("Baixa") E QTD_PRODUTOS ≥ 2 | bool | Já é cliente de mais de um produto, mas pouco ativo |
+| FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO | CLASSIFICACAO_ID = 1 ("Em Desenvolvimento") E NIVEL_MOVIMENTACAO_ID ∈ {1, 2} ("Média"/"Alta") | bool | Poucos produtos, mas já engajado financeiramente |
+
+## 6. Dimensões (Gold)
+
+Tabelas auxiliares de de-para ID → descrição, construídas por `build_dimensions()` (`src/features/dimensoes.py`) e persistidas por `run_gold()` (`src/pipeline.py`). Cada uma tem duas colunas — `ID` (int64) e `DESCRICAO` (string) — e se relaciona com a fato (seção 5) pela coluna `*_ID` correspondente. Fonte de verdade dos pares ID/descrição: os `DIM_*` em `src/config/settings.py`.
+
+### 6.1 `dim_faixa_renda.parquet`
+
+| ID | DESCRICAO |
+|---|---|
+| 0 | Até R$ 3.000 |
+| 1 | R$ 3.001 a R$ 8.000 |
+| 2 | R$ 8.001 a R$ 15.000 |
+| 3 | Acima de R$ 15.000 |
+| -1 | Não informado |
+
+### 6.2 `dim_nivel_diversificacao.parquet`
+
+| ID | DESCRICAO |
+|---|---|
+| 0 | Baixa |
+| 1 | Média |
+| 2 | Alta |
+
+### 6.3 `dim_nivel_movimentacao.parquet`
+
+Compartilhada por `NIVEL_SALDO_MEDIO_ID`, `NIVEL_PIX_MENSAL_ID`, `NIVEL_COMPRAS_CARTAO_ID` e `NIVEL_MOVIMENTACAO_ID` (seção 5.3) — mesmo domínio.
+
+| ID | DESCRICAO |
+|---|---|
+| 0 | Baixa |
+| 1 | Média |
+| 2 | Alta |
+
+### 6.4 `dim_classificacao.parquet`
+
+| ID | DESCRICAO |
+|---|---|
+| 0 | Inicial |
+| 1 | Em Desenvolvimento |
+| 2 | Maduro |
+| 3 | Engajado |
+
+A ordem crescente do ID já reflete a ordem de negócio (pior → melhor) em todas as quatro dimensões — útil para ordenar eixos/legendas no Power BI sem depender de texto.
 
 ## Observação sobre os dados
 

@@ -1,24 +1,26 @@
-"""Classificação dos associados por índice composto de percentil.
+"""Classificação (ID) dos associados por índice composto de percentil.
+IDs seguem a dimensão `DIM_CLASSIFICACAO` (`src/config/settings.py`).
 Ver `docs/regras_negocio.md` (seção 5) para a metodologia e a justificativa
 da escolha em relação às regras sequenciais avaliadas originalmente.
 """
 
 import pandas as pd
 
-from src.config.settings import CLASSIFICACAO_LABELS, CLASSIFICACAO_PESOS
+from src.config.settings import CLASSIFICACAO_IDS, CLASSIFICACAO_PESOS
 
 SCORE_NEUTRO_TEMPO_INDISPONIVEL = 0.5
 
 
 def add_classificacao(df):
-    """Calcula o índice composto de classificação e o corta em quartis.
+    """Calcula o índice composto de classificação e o corta em quartis (ID).
 
     Cada associado recebe um percentil (`rank(pct=True)`, 0 a 1) em cada
     um dos quatro pilares — Produtos, Relacionamento, Saldo e Utilização
     (média dos percentis de PIX e compras no cartão) —, combinados em
     `INDICE_CLASSIFICACAO` pela soma ponderada de `CLASSIFICACAO_PESOS`.
-    `CLASSIFICACAO` é o corte desse índice em quartis, rotulado por
-    `CLASSIFICACAO_LABELS` em ordem crescente.
+    `CLASSIFICACAO_ID` é o corte desse índice em quartis, com os IDs de
+    `CLASSIFICACAO_IDS` em ordem crescente (o rótulo de cada ID vive em
+    `DIM_CLASSIFICACAO`, não nesta coluna).
 
     Associados com `TEMPO_RELACIONAMENTO_ANOS` nulo (data de associação
     futura, ver `src/features/associados.py`) recebem
@@ -34,7 +36,7 @@ def add_classificacao(df):
     Returns:
         Cópia de `df` com `SCORE_PRODUTOS`, `SCORE_RELACIONAMENTO`,
         `SCORE_SALDO`, `SCORE_UTILIZACAO`, `INDICE_CLASSIFICACAO`,
-        `CLASSIFICACAO_TEMPO_INDISPONIVEL` e `CLASSIFICACAO` adicionadas.
+        `CLASSIFICACAO_TEMPO_INDISPONIVEL` e `CLASSIFICACAO_ID` adicionadas.
     """
     df = df.copy()
 
@@ -58,10 +60,8 @@ def add_classificacao(df):
         + score_utilizacao * CLASSIFICACAO_PESOS["utilizacao"]
     ).round(4)
 
-    df["CLASSIFICACAO"] = pd.Categorical(
-        pd.qcut(df["INDICE_CLASSIFICACAO"], 4, labels=CLASSIFICACAO_LABELS),
-        categories=CLASSIFICACAO_LABELS,
-        ordered=True,
-    )
+    df["CLASSIFICACAO_ID"] = pd.qcut(
+        df["INDICE_CLASSIFICACAO"], len(CLASSIFICACAO_IDS), labels=CLASSIFICACAO_IDS
+    ).astype("int64")
 
     return df

@@ -1,14 +1,18 @@
 """Testes da camada Features/Gold: indicadores de produtos, tempo de
 relacionamento, faixa de renda, consolidação, nível de movimentação,
-classificação e flags de oportunidade (`src/features/*.py`).
+classificação, flags de oportunidade e tabelas de dimensão (`src/features/*.py`).
 """
 
 import pandas as pd
 import pytest
 
 from src.config.settings import (
-    CLASSIFICACAO_LABELS,
     DIAS_POR_ANO,
+    DIM_CLASSIFICACAO,
+    DIM_FAIXA_RENDA,
+    DIM_NIVEL_DIVERSIFICACAO,
+    DIM_NIVEL_MOVIMENTACAO,
+    FAIXA_RENDA_NAO_INFORMADO_ID,
     FAIXAS_DIVERSIFICACAO,
     FAIXAS_RENDA,
     KEY_COLUMN,
@@ -17,20 +21,17 @@ from src.config.settings import (
     OPORTUNIDADE_POTENCIAL_CRESCIMENTO,
     TERCIS_MOVIMENTACAO,
 )
-from src.features.associados import (
-    FAIXA_RENDA_NAO_INFORMADO,
-    add_faixa_renda,
-    add_indicadores_relacionamento,
-)
+from src.features.associados import add_faixa_renda, add_indicadores_relacionamento
 from src.features.consolidado import build_features
-from src.features.movimentacao import NIVEIS_MOVIMENTACAO
+from src.features.dimensoes import build_dimensions
+from src.features.movimentacao import IDS_NIVEL_MOVIMENTACAO
 from src.features.produtos import TOTAL_PRODUTOS_POSSIVEIS, add_indicadores_produtos
 from src.pipeline import SILVER_ASSOCIADOS_PATH, SILVER_MOVIMENTACAO_PATH, SILVER_PRODUTOS_PATH
 
 
 @pytest.fixture(scope="module")
 def produtos_features():
-    """Silver de Produtos com INDICE_DIVERSIFICACAO/NIVEL_DIVERSIFICACAO adicionados."""
+    """Silver de Produtos com INDICE_DIVERSIFICACAO/NIVEL_DIVERSIFICACAO_ID adicionados."""
     df = pd.read_parquet(SILVER_PRODUTOS_PATH)
     return add_indicadores_produtos(df)
 
@@ -44,7 +45,7 @@ def associados_features():
 
 @pytest.fixture(scope="module")
 def associados_faixa_renda():
-    """Silver de Associados com FAIXA_RENDA adicionada."""
+    """Silver de Associados com FAIXA_RENDA_ID adicionada."""
     df = pd.read_parquet(SILVER_ASSOCIADOS_PATH)
     return add_faixa_renda(df)
 
@@ -60,20 +61,26 @@ def features_consolidadas():
     return build_features(associados, produtos, movimentacao)
 
 
+@pytest.fixture(scope="module")
+def dimensoes():
+    """As quatro tabelas de dimensão (ID -> descrição) da Gold."""
+    return build_dimensions()
+
+
 def test_indice_diversificacao_dominio(produtos_features):
     assert produtos_features["INDICE_DIVERSIFICACAO"].between(0, 1).all()
     esperado = produtos_features["QTD_PRODUTOS"] / TOTAL_PRODUTOS_POSSIVEIS
     assert (produtos_features["INDICE_DIVERSIFICACAO"].round(4) == esperado.round(4)).all()
 
 
-def test_nivel_diversificacao_categorias(produtos_features):
-    esperado = {nome for nome, _, _ in FAIXAS_DIVERSIFICACAO}
-    assert set(produtos_features["NIVEL_DIVERSIFICACAO"].dropna().unique()) == esperado
+def test_nivel_diversificacao_id_dominio(produtos_features):
+    esperado = {id_ for id_, _, _ in FAIXAS_DIVERSIFICACAO}
+    assert set(produtos_features["NIVEL_DIVERSIFICACAO_ID"].dropna().unique()) == esperado
 
 
-def test_nivel_diversificacao_consistente_com_qtd_produtos(produtos_features):
-    for nome, minimo, maximo in FAIXAS_DIVERSIFICACAO:
-        qtd = produtos_features.loc[produtos_features["NIVEL_DIVERSIFICACAO"] == nome, "QTD_PRODUTOS"]
+def test_nivel_diversificacao_id_consistente_com_qtd_produtos(produtos_features):
+    for id_, minimo, maximo in FAIXAS_DIVERSIFICACAO:
+        qtd = produtos_features.loc[produtos_features["NIVEL_DIVERSIFICACAO_ID"] == id_, "QTD_PRODUTOS"]
         assert qtd.between(minimo, maximo).all()
 
 
@@ -102,24 +109,25 @@ def test_tempo_relacionamento_anos_consistente_com_dias(associados_features):
 # --- Faixa de renda ---
 
 
-def test_faixa_renda_categorias(associados_faixa_renda):
-    esperado = {nome for nome, _, _ in FAIXAS_RENDA} | {FAIXA_RENDA_NAO_INFORMADO}
-    assert set(associados_faixa_renda["FAIXA_RENDA"].dropna().unique()) == esperado
+def test_faixa_renda_id_dominio(associados_faixa_renda):
+    esperado = {id_ for id_, _, _ in FAIXAS_RENDA} | {FAIXA_RENDA_NAO_INFORMADO_ID}
+    assert set(associados_faixa_renda["FAIXA_RENDA_ID"].dropna().unique()) == esperado
 
 
-def test_faixa_renda_nao_informado_em_renda_nula(associados_faixa_renda):
+def test_faixa_renda_id_nao_informado_em_renda_nula(associados_faixa_renda):
     nula = associados_faixa_renda["RENDA_MENSAL"].isna()
-    assert (associados_faixa_renda.loc[nula, "FAIXA_RENDA"] == FAIXA_RENDA_NAO_INFORMADO).all()
-    assert (associados_faixa_renda.loc[~nula, "FAIXA_RENDA"] != FAIXA_RENDA_NAO_INFORMADO).all()
+    assert (associados_faixa_renda.loc[nula, "FAIXA_RENDA_ID"] == FAIXA_RENDA_NAO_INFORMADO_ID).all()
+    assert (associados_faixa_renda.loc[~nula, "FAIXA_RENDA_ID"] != FAIXA_RENDA_NAO_INFORMADO_ID).all()
 
 
-def test_faixa_renda_limites_consistentes(associados_faixa_renda):
+def test_faixa_renda_id_limites_consistentes(associados_faixa_renda):
     limite_anterior = 0
-    for nome, _, maximo in FAIXAS_RENDA:
-        renda = associados_faixa_renda.loc[associados_faixa_renda["FAIXA_RENDA"] == nome, "RENDA_MENSAL"]
+    for id_, _, maximo in FAIXAS_RENDA:
+        renda = associados_faixa_renda.loc[associados_faixa_renda["FAIXA_RENDA_ID"] == id_, "RENDA_MENSAL"]
         assert (renda > limite_anterior).all()
         if maximo is not None:
             assert (renda <= maximo).all()
+        limite_anterior = maximo if maximo is not None else limite_anterior
 
 
 # --- Consolidação de features ---
@@ -134,14 +142,14 @@ def test_features_consolidadas_contem_indicadores_das_tres_entidades(features_co
     colunas_esperadas = {
         "QTD_PRODUTOS",
         "INDICE_DIVERSIFICACAO",
-        "NIVEL_DIVERSIFICACAO",
+        "NIVEL_DIVERSIFICACAO_ID",
         "TEMPO_RELACIONAMENTO_DIAS",
         "TEMPO_RELACIONAMENTO_ANOS",
-        "FAIXA_RENDA",
+        "FAIXA_RENDA_ID",
         "SALDO_MEDIO",
         "PIX_MENSAL",
         "COMPRAS_CARTAO",
-        "NIVEL_MOVIMENTACAO",
+        "NIVEL_MOVIMENTACAO_ID",
     }
     assert colunas_esperadas <= set(features_consolidadas.columns)
 
@@ -149,18 +157,18 @@ def test_features_consolidadas_contem_indicadores_das_tres_entidades(features_co
 # --- Nível de movimentação ---
 
 
-def test_nivel_movimentacao_dominio(features_consolidadas):
-    assert set(features_consolidadas["NIVEL_MOVIMENTACAO"].dropna().unique()) <= set(NIVEIS_MOVIMENTACAO)
-    assert features_consolidadas["NIVEL_MOVIMENTACAO"].notna().all()
+def test_nivel_movimentacao_id_dominio(features_consolidadas):
+    assert set(features_consolidadas["NIVEL_MOVIMENTACAO_ID"].dropna().unique()) <= set(IDS_NIVEL_MOVIMENTACAO)
+    assert features_consolidadas["NIVEL_MOVIMENTACAO_ID"].notna().all()
 
 
-def test_nivel_movimentacao_consistente_com_tercis_saldo_medio(features_consolidadas):
+def test_nivel_movimentacao_id_consistente_com_tercis_saldo_medio(features_consolidadas):
     baixo, alto = TERCIS_MOVIMENTACAO["SALDO_MEDIO"]
-    coincide_com_saldo = features_consolidadas["NIVEL_MOVIMENTACAO"] == pd.cut(
+    coincide_com_saldo = features_consolidadas["NIVEL_MOVIMENTACAO_ID"] == pd.cut(
         features_consolidadas["SALDO_MEDIO"],
         bins=[-float("inf"), baixo, alto, float("inf")],
-        labels=NIVEIS_MOVIMENTACAO,
-    )
+        labels=IDS_NIVEL_MOVIMENTACAO,
+    ).astype("int64")
     # SALDO_MEDIO é o critério de desempate; deve coincidir na maioria dos casos
     # (todas as linhas onde não houve empate entre os três indicadores).
     assert coincide_com_saldo.mean() > 0.5
@@ -169,14 +177,15 @@ def test_nivel_movimentacao_consistente_com_tercis_saldo_medio(features_consolid
 # --- Classificação dos associados ---
 
 
-def test_classificacao_dominio(features_consolidadas):
-    assert set(features_consolidadas["CLASSIFICACAO"].dropna().unique()) == set(CLASSIFICACAO_LABELS)
-    assert features_consolidadas["CLASSIFICACAO"].notna().all()
+def test_classificacao_id_dominio(features_consolidadas):
+    ids_esperados = {id_ for id_, _ in DIM_CLASSIFICACAO}
+    assert set(features_consolidadas["CLASSIFICACAO_ID"].dropna().unique()) == ids_esperados
+    assert features_consolidadas["CLASSIFICACAO_ID"].notna().all()
 
 
-def test_classificacao_grupos_balanceados(features_consolidadas):
-    contagem = features_consolidadas["CLASSIFICACAO"].value_counts()
-    esperado = len(features_consolidadas) / len(CLASSIFICACAO_LABELS)
+def test_classificacao_id_grupos_balanceados(features_consolidadas):
+    contagem = features_consolidadas["CLASSIFICACAO_ID"].value_counts()
+    esperado = len(features_consolidadas) / len(DIM_CLASSIFICACAO)
     assert (contagem.between(esperado * 0.9, esperado * 1.1)).all()
 
 
@@ -188,12 +197,13 @@ def test_classificacao_tempo_indisponivel_consistente_com_tempo_nulo(features_co
     tempo_nulo = features_consolidadas["TEMPO_RELACIONAMENTO_ANOS"].isna()
     assert (features_consolidadas.loc[tempo_nulo, "CLASSIFICACAO_TEMPO_INDISPONIVEL"]).all()
     assert (~features_consolidadas.loc[~tempo_nulo, "CLASSIFICACAO_TEMPO_INDISPONIVEL"]).all()
-    assert features_consolidadas.loc[tempo_nulo, "CLASSIFICACAO"].notna().all()
+    assert features_consolidadas.loc[tempo_nulo, "CLASSIFICACAO_ID"].notna().all()
 
 
 def test_classificacao_ordem_coerente_com_saldo_medio(features_consolidadas):
-    medias = features_consolidadas.groupby("CLASSIFICACAO", observed=True)["SALDO_MEDIO"].mean()
-    medias = medias.reindex(CLASSIFICACAO_LABELS)
+    ids_em_ordem = [id_ for id_, _ in DIM_CLASSIFICACAO]
+    medias = features_consolidadas.groupby("CLASSIFICACAO_ID")["SALDO_MEDIO"].mean()
+    medias = medias.reindex(ids_em_ordem)
     assert medias.is_monotonic_increasing
 
 
@@ -203,7 +213,7 @@ def test_classificacao_ordem_coerente_com_saldo_medio(features_consolidadas):
 def test_flag_alta_renda_poucos_produtos_consistente(features_consolidadas):
     cfg = OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS
     flag = features_consolidadas["FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS"]
-    esperado = (features_consolidadas["FAIXA_RENDA"] == cfg["faixa_renda"]) & (
+    esperado = (features_consolidadas["FAIXA_RENDA_ID"] == cfg["faixa_renda_id"]) & (
         features_consolidadas["QTD_PRODUTOS"] <= cfg["qtd_produtos_max"]
     )
     assert (flag == esperado).all()
@@ -212,7 +222,7 @@ def test_flag_alta_renda_poucos_produtos_consistente(features_consolidadas):
 def test_flag_baixa_utilizacao_consistente(features_consolidadas):
     cfg = OPORTUNIDADE_BAIXA_UTILIZACAO
     flag = features_consolidadas["FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO"]
-    esperado = (features_consolidadas["NIVEL_MOVIMENTACAO"] == cfg["nivel_movimentacao"]) & (
+    esperado = (features_consolidadas["NIVEL_MOVIMENTACAO_ID"] == cfg["nivel_movimentacao_id"]) & (
         features_consolidadas["QTD_PRODUTOS"] >= cfg["qtd_produtos_min"]
     )
     assert (flag == esperado).all()
@@ -221,8 +231,8 @@ def test_flag_baixa_utilizacao_consistente(features_consolidadas):
 def test_flag_potencial_crescimento_consistente(features_consolidadas):
     cfg = OPORTUNIDADE_POTENCIAL_CRESCIMENTO
     flag = features_consolidadas["FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO"]
-    esperado = (features_consolidadas["CLASSIFICACAO"] == cfg["classificacao"]) & (
-        features_consolidadas["NIVEL_MOVIMENTACAO"].isin(cfg["nivel_movimentacao"])
+    esperado = (features_consolidadas["CLASSIFICACAO_ID"] == cfg["classificacao_id"]) & (
+        features_consolidadas["NIVEL_MOVIMENTACAO_ID"].isin(cfg["nivel_movimentacao_ids"])
     )
     assert (flag == esperado).all()
 
@@ -235,3 +245,58 @@ def test_flags_oportunidade_sao_booleanas(features_consolidadas):
     ]
     for coluna in colunas:
         assert features_consolidadas[coluna].dtype == bool
+
+
+# --- Dimensões ---
+
+
+def test_dimensoes_nomes_esperados(dimensoes):
+    assert set(dimensoes.keys()) == {
+        "faixa_renda",
+        "nivel_diversificacao",
+        "nivel_movimentacao",
+        "classificacao",
+    }
+
+
+def test_dimensoes_schema_e_chave_unica(dimensoes):
+    for nome, dim in dimensoes.items():
+        assert list(dim.columns) == ["ID", "DESCRICAO"], nome
+        assert not dim["ID"].duplicated().any(), nome
+        assert dim["DESCRICAO"].notna().all(), nome
+
+
+def test_dimensao_faixa_renda_bate_com_settings(dimensoes):
+    esperado = {id_: descricao for id_, descricao in DIM_FAIXA_RENDA}
+    obtido = dict(zip(dimensoes["faixa_renda"]["ID"], dimensoes["faixa_renda"]["DESCRICAO"]))
+    assert obtido == esperado
+
+
+def test_dimensao_nivel_diversificacao_bate_com_settings(dimensoes):
+    esperado = {id_: descricao for id_, descricao in DIM_NIVEL_DIVERSIFICACAO}
+    obtido = dict(zip(dimensoes["nivel_diversificacao"]["ID"], dimensoes["nivel_diversificacao"]["DESCRICAO"]))
+    assert obtido == esperado
+
+
+def test_dimensao_nivel_movimentacao_bate_com_settings(dimensoes):
+    esperado = {id_: descricao for id_, descricao in DIM_NIVEL_MOVIMENTACAO}
+    obtido = dict(zip(dimensoes["nivel_movimentacao"]["ID"], dimensoes["nivel_movimentacao"]["DESCRICAO"]))
+    assert obtido == esperado
+
+
+def test_dimensao_classificacao_bate_com_settings(dimensoes):
+    esperado = {id_: descricao for id_, descricao in DIM_CLASSIFICACAO}
+    obtido = dict(zip(dimensoes["classificacao"]["ID"], dimensoes["classificacao"]["DESCRICAO"]))
+    assert obtido == esperado
+
+
+def test_ids_da_fato_existem_nas_dimensoes(features_consolidadas, dimensoes):
+    """Integridade referencial: todo ID gravado na fato deve existir na dimensão correspondente."""
+    assert set(features_consolidadas["FAIXA_RENDA_ID"].unique()) <= set(dimensoes["faixa_renda"]["ID"])
+    assert set(features_consolidadas["NIVEL_DIVERSIFICACAO_ID"].unique()) <= set(
+        dimensoes["nivel_diversificacao"]["ID"]
+    )
+    assert set(features_consolidadas["NIVEL_MOVIMENTACAO_ID"].unique()) <= set(
+        dimensoes["nivel_movimentacao"]["ID"]
+    )
+    assert set(features_consolidadas["CLASSIFICACAO_ID"].unique()) <= set(dimensoes["classificacao"]["ID"])

@@ -1,5 +1,5 @@
-"""Flags de oportunidade: cruzamentos de indicadores já calculados na Gold,
-parametrizados em `src/config/settings.py`. Ver `docs/regras_negocio.md`
+"""Flags de oportunidade: cruzamentos de indicadores (IDs) já calculados na
+Gold, parametrizados em `src/config/settings.py`. Ver `docs/regras_negocio.md`
 (seção 6). As três flags não são mutuamente exclusivas.
 """
 
@@ -24,10 +24,11 @@ def add_flags_oportunidade(df):
       produtos, mas já engajado financeiramente.
 
     Args:
-        df: `DataFrame` (Gold) já contendo `FAIXA_RENDA`, `QTD_PRODUTOS`,
-            `NIVEL_MOVIMENTACAO` e `CLASSIFICACAO` (produzidos por
-            `add_faixa_renda`, `clean_produtos`, `add_nivel_movimentacao`
-            e `add_classificacao`, respectivamente).
+        df: `DataFrame` (Gold) já contendo `FAIXA_RENDA_ID`,
+            `QTD_PRODUTOS`, `NIVEL_MOVIMENTACAO_ID` e `CLASSIFICACAO_ID`
+            (produzidos por `add_faixa_renda`, `clean_produtos`,
+            `add_nivel_movimentacao` e `add_classificacao`,
+            respectivamente).
 
     Returns:
         Cópia de `df` com as três colunas `FLAG_OPORTUNIDADE_*`
@@ -37,18 +38,18 @@ def add_flags_oportunidade(df):
 
     cfg = OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS
     df["FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS"] = (
-        (df["FAIXA_RENDA"] == cfg["faixa_renda"]) & (df["QTD_PRODUTOS"] <= cfg["qtd_produtos_max"])
+        (df["FAIXA_RENDA_ID"] == cfg["faixa_renda_id"]) & (df["QTD_PRODUTOS"] <= cfg["qtd_produtos_max"])
     )
 
     cfg = OPORTUNIDADE_BAIXA_UTILIZACAO
     df["FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO"] = (
-        (df["NIVEL_MOVIMENTACAO"] == cfg["nivel_movimentacao"]) & (df["QTD_PRODUTOS"] >= cfg["qtd_produtos_min"])
+        (df["NIVEL_MOVIMENTACAO_ID"] == cfg["nivel_movimentacao_id"]) & (df["QTD_PRODUTOS"] >= cfg["qtd_produtos_min"])
     )
 
     cfg = OPORTUNIDADE_POTENCIAL_CRESCIMENTO
     df["FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO"] = (
-        (df["CLASSIFICACAO"] == cfg["classificacao"])
-        & (df["NIVEL_MOVIMENTACAO"].isin(cfg["nivel_movimentacao"]))
+        (df["CLASSIFICACAO_ID"] == cfg["classificacao_id"])
+        & (df["NIVEL_MOVIMENTACAO_ID"].isin(cfg["nivel_movimentacao_ids"]))
     )
 
     return df
