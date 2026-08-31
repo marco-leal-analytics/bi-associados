@@ -1,0 +1,122 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "71998145c7364726b9a5",
+  "position": {
+    "x": 385,
+    "y": 500,
+    "z": 0,
+    "height": 440,
+    "width": 1495,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Classificação"
+                    }
+                  },
+                  "Property": "DESCRICAO"
+                }
+              },
+              "queryRef": "Dim_Classificação.DESCRICAO",
+              "nativeQueryRef": "Faixa de Classificação",
+              "displayName": "Faixa de Classificação"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Total de Associados"
+                }
+              },
+              "queryRef": "_Medidas.Total de Associados",
+              "nativeQueryRef": "Total de Associados"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% de Associados"
+                }
+              },
+              "queryRef": "_Medidas.% de Associados",
+              "nativeQueryRef": "% de Associados"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Renda Média"
+                }
+              },
+              "queryRef": "_Medidas.Renda Média",
+              "nativeQueryRef": "Renda Média"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Saldo Médio"
+                }
+              },
+              "queryRef": "_Medidas.Saldo Médio",
+              "nativeQueryRef": "Saldo Médio"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Produtos por Associado"
+                }
+              },
+              "queryRef": "_Medidas.Produtos por Associado",
+              "nativeQueryRef": "Produtos por Associado"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tempo Médio de Relacionamento (Anos)"
+                }
+              },
+              "queryRef": "_Medidas.Tempo Médio de Relacionamento (Anos)",
+              "nativeQueryRef": "Tempo Médio de Relacionamento (Anos)"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

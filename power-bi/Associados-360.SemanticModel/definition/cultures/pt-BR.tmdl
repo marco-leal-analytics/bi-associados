@@ -686,6 +686,26 @@ cultureInfo pt-BR
 			          "descricao": {
 			            "State": "Generated"
 			          }
+			        },
+			        {
+			          "Faixa Classificação Utilização Produtos": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "Faixa de Classificação": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
 			        }
 			      ]
 			    },
@@ -1900,6 +1920,193 @@ cultureInfo pt-BR
 			          }
 			        }
 			      ]
+			    },
+			    "fato_associado.tempo_relacionamento_faixa_id": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Fato_Associados",
+			          "ConceptualProperty": "TEMPO_RELACIONAMENTO_FAIXA_ID"
+			        }
+			      },
+			      "State": "Generated",
+			      "Visibility": {
+			        "Value": "Hidden"
+			      },
+			      "Terms": [
+			        {
+			          "tempo relacionamento faixa id": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "TEMPO_RELACIONAMENTO_FAIXA_ID": {
+			            "Type": "Noun",
+			            "State": "Generated",
+			            "Weight": 0.99
+			          }
+			        },
+			        {
+			          "tempo relacionamento faixa identification": {
+			            "Type": "Noun",
+			            "State": "Suggested",
+			            "Source": {
+			              "Agent": "Thesaurus"
+			            },
+			            "Weight": 0.771
+			          }
+			        },
+			        {
+			          "tempo relacionamento faixa identity": {
+			            "Type": "Noun",
+			            "State": "Suggested",
+			            "Source": {
+			              "Agent": "Thesaurus"
+			            },
+			            "Weight": 0.771
+			          }
+			        },
+			        {
+			          "tempo relacionamento faixa identifier": {
+			            "Type": "Noun",
+			            "State": "Suggested",
+			            "Source": {
+			              "Agent": "Thesaurus"
+			            },
+			            "Weight": 0.771
+			          }
+			        },
+			        {
+			          "tempo relacionamento faixa credential": {
+			            "Type": "Noun",
+			            "State": "Suggested",
+			            "Source": {
+			              "Agent": "Thesaurus"
+			            },
+			            "Weight": 0.748
+			          }
+			        }
+			      ]
+			    },
+			    "entity__medida.de_associados": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "% de Associados"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% de associados": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "percentage de associado": {
+			            "Type": "Noun",
+			            "State": "Suggested",
+			            "Source": {
+			              "Agent": "Thesaurus"
+			            },
+			            "Weight": 0.609
+			          }
+			        },
+			        {
+			          "pct de associado": {
+			            "Type": "Noun",
+			            "State": "Suggested",
+			            "Source": {
+			              "Agent": "Thesaurus"
+			            },
+			            "Weight": 0.591
+			          }
+			        }
+			      ]
+			    },
+			    "dim_tempo_relacionamento": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim_TempoRelacionamento"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "dim tempo relacionamento": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "Dim_TempoRelacionamento": {
+			            "Type": "Noun",
+			            "State": "Generated",
+			            "Weight": 0.99
+			          }
+			        }
+			      ]
+			    },
+			    "dim_tempo_relacionamento.ID": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim_TempoRelacionamento",
+			          "ConceptualProperty": "ID"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ID": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "identification": {
+			            "Type": "Noun",
+			            "State": "Suggested",
+			            "Source": {
+			              "Agent": "Thesaurus"
+			            },
+			            "Weight": 0.736
+			          }
+			        },
+			        {
+			          "identity": {
+			            "Type": "Noun",
+			            "State": "Suggested",
+			            "Source": {
+			              "Agent": "Thesaurus"
+			            },
+			            "Weight": 0.736
+			          }
+			        },
+			        {
+			          "credential": {
+			            "Type": "Noun",
+			            "State": "Suggested",
+			            "Source": {
+			              "Agent": "Thesaurus"
+			            },
+			            "Weight": 0.714
+			          }
+			        }
+			      ],
+			      "NameType": "Identifier"
+			    },
+			    "dim_tempo_relacionamento.descricao": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim_TempoRelacionamento",
+			          "ConceptualProperty": "DESCRICAO"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "descricao": {
+			            "State": "Generated"
+			          }
+			        }
+			      ]
 			    }
 			  },
 			  "Relationships": {
@@ -1999,6 +2206,52 @@ cultureInfo pt-BR
 			          "State": "Generated",
 			          "Weight": 0.99,
 			          "ID": "data_have_hierarquia_de_data"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_dim_tempo_relacionamento": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "dim_tempo_relacionamento": {
+			          "Target": {
+			            "Entity": "dim_tempo_relacionamento"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "dim_tempo_relacionamento"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_dim_tempo_relacionamentos"
+			        },
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "dim_tempo_relacionamento"
+			            },
+			            "Object": {
+			              "Role": "fato_associado"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "dim_tempo_relacionamentos_have_fato_associados"
 			        }
 			      ]
 			    },
@@ -2183,6 +2436,118 @@ cultureInfo pt-BR
 			          "State": "Generated",
 			          "Weight": 0.99,
 			          "ID": "dim_agências_have_fato_associados"
+			        }
+			      ]
+			    },
+			    "dim_tempo_relacionamento_has_descricao": {
+			      "Binding": {
+			        "ConceptualEntity": "Dim_TempoRelacionamento"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "dim_tempo_relacionamento": {
+			          "Target": {
+			            "Entity": "dim_tempo_relacionamento"
+			          }
+			        },
+			        "dim_tempo_relacionamento.descricao": {
+			          "Target": {
+			            "Entity": "dim_tempo_relacionamento.descricao"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "dim_tempo_relacionamento"
+			            },
+			            "Object": {
+			              "Role": "dim_tempo_relacionamento.descricao"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "dim_tempo_relacionamentos_have_descricaos"
+			        }
+			      ]
+			    },
+			    "dim_tempo_relacionamento_has_ID": {
+			      "Binding": {
+			        "ConceptualEntity": "Dim_TempoRelacionamento"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "dim_tempo_relacionamento": {
+			          "Target": {
+			            "Entity": "dim_tempo_relacionamento"
+			          }
+			        },
+			        "dim_tempo_relacionamento.ID": {
+			          "Target": {
+			            "Entity": "dim_tempo_relacionamento.ID"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "dim_tempo_relacionamento"
+			            },
+			            "Object": {
+			              "Role": "dim_tempo_relacionamento.ID"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "dim_tempo_relacionamentos_have_ID"
+			        },
+			        {
+			          "Name": {
+			            "Subject": {
+			              "Role": "dim_tempo_relacionamento"
+			            },
+			            "Name": {
+			              "Role": "dim_tempo_relacionamento.ID"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "ID_are_names_IDs_of_dim_tempo_relacionamentos"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_entity__medida_de_associados": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "entity__medida.de_associados": {
+			          "Target": {
+			            "Entity": "entity__medida.de_associados"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "entity__medida.de_associados"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have__de_associados"
 			        }
 			      ]
 			    },

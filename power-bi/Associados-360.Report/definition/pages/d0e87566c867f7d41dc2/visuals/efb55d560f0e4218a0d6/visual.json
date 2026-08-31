@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "efb55d560f0e4218a0d6",
+  "position": {
+    "x": 385,
+    "y": 1000,
+    "z": 0,
+    "width": 1495,
+    "height": 40,
+    "tabOrder": 3
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Associados com CLASSIFICACAO_TEMPO_INDISPONIVEL têm o score de relacionamento neutralizado (0,5) no cálculo do índice de classificação."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

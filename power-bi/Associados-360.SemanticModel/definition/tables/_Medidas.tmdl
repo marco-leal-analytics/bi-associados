@@ -26,6 +26,11 @@ table _Medidas
 		displayFolder: Médias
 		lineageTag: 6f2ba6e3-9a9d-4a4f-8d61-3ea8b74a5b12
 
+	measure '% de Associados' = DIVIDE([Total de Associados], CALCULATE([Total de Associados], ALL(Fato_Associados)))
+		formatString: 0.0%
+		displayFolder: #Contagens
+		lineageTag: 9a1e5c7f-3d2b-4c6a-8e4f-1b7c9d3a5f60
+
 	partition _Medidas = m
 		mode: import
 		source =
