@@ -126,6 +126,27 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 | FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO | NIVEL_MOVIMENTACAO_ID = 0 ("Baixa") E QTD_PRODUTOS ≥ 2 | bool | Já é cliente de mais de um produto, mas pouco ativo |
 | FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO | CLASSIFICACAO_ID = 1 ("Em Desenvolvimento") E NIVEL_MOVIMENTACAO_ID ∈ {1, 2} ("Média"/"Alta") | bool | Poucos produtos, mas já engajado financeiramente |
 
+### 5.6 Tabela reduzida para o Power BI (`features_dashboard.parquet`)
+
+`data/2_gold/features_dashboard.parquet`: projeção de `features.parquet` (seção 5) só com as colunas que alimentam algum visual das 4 páginas do dashboard (`regras_negocio.md`, seção 7), gerada por `build_dashboard_features` (`src/features/consolidado.py`) a partir de `DASHBOARD_COLUMNS` (`src/config/settings.py`) e persistida por `run_gold` (`src/pipeline.py`). 1000 linhas × 14 colunas, contra 39 colunas da fato completa — os campos deixados de fora são todos intermediários de cálculo (pilares `SCORE_*`, níveis individuais de movimentação, `INDICE_*`, colunas de produto por tipo, flags `*_INVALIDO` de qualidade) que já foram consumidos para produzir `CLASSIFICACAO_ID`/`FLAG_OPORTUNIDADE_*` e não têm visual próprio no desafio. Esta é a tabela recomendada para o import no Power BI (junto das quatro dimensões da seção 6); `features.parquet` continua disponível como fato completa/auditável.
+
+| Coluna | Página que usa | Papel |
+|---|---|---|
+| CHAVE | Todas | Chave de linha / contagem de associados (Página 1) |
+| AGENCIA | Página 2 | Associados por Agência |
+| CIDADE | Página 2 | Associados por Cidade |
+| RENDA_MENSAL | Página 1 | Renda Média |
+| FAIXA_RENDA_ID | Página 2 | FK para `dim_faixa_renda` |
+| SALDO_MEDIO | Página 1 | Saldo Médio |
+| QTD_PRODUTOS | Página 1 | Produtos por Associado |
+| TEMPO_RELACIONAMENTO_ANOS | Página 2 | Tempo de Relacionamento |
+| DATA_ASSOCIACAO_INVALIDA | Todas (nota de rodapé) | Sinaliza os 37 registros excluídos do cálculo de tempo — ver `insights.md` |
+| CLASSIFICACAO_ID | Página 3 | FK para `dim_classificacao` |
+| CLASSIFICACAO_TEMPO_INDISPONIVEL | Página 3 (transparência) | Sinaliza score de relacionamento neutralizado |
+| FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS | Página 4 | Lista de oportunidade |
+| FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO | Página 4 | Lista de oportunidade |
+| FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO | Página 4 | Lista de oportunidade |
+
 ## 6. Dimensões (Gold)
 
 Tabelas auxiliares de de-para ID → descrição, construídas por `build_dimensions()` (`src/features/dimensoes.py`) e persistidas por `run_gold()` (`src/pipeline.py`). Cada uma tem duas colunas — `ID` (int64) e `DESCRICAO` (string) — e se relaciona com a fato (seção 5) pela coluna `*_ID` correspondente. Fonte de verdade dos pares ID/descrição: os `DIM_*` em `src/config/settings.py`.

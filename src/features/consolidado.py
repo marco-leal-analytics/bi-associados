@@ -3,7 +3,7 @@ Movimentacao pela CHAVE e aplicação de todos os indicadores/classificação.
 Orquestrado por `run_gold` em `src/pipeline.py`.
 """
 
-from src.config.settings import KEY_COLUMN
+from src.config.settings import DASHBOARD_COLUMNS, KEY_COLUMN
 from src.features.associados import add_faixa_renda, add_indicadores_relacionamento
 from src.features.classificacao import add_classificacao
 from src.features.movimentacao import add_nivel_movimentacao
@@ -60,3 +60,25 @@ def build_features(associados, produtos, movimentacao, reference_date=None):
     df = add_flags_oportunidade(df)
 
     return df
+
+
+def build_dashboard_features(features):
+    """Projeta a Gold completa nas colunas efetivamente usadas pelo dashboard Power BI.
+
+    A fato completa (`features`, retorno de `build_features`) carrega campos
+    intermediários do cálculo — pilares de score, níveis individuais de
+    movimentação, colunas de produto por tipo — que nenhuma das 4 páginas do
+    dashboard usa diretamente (ver `docs/regras_negocio.md`, seção 7).
+    Importar essas colunas no Power BI não erra o resultado, mas infla o
+    modelo sem necessidade. `DASHBOARD_COLUMNS` (`src/config/settings.py`)
+    é a lista de colunas de fato necessárias; some-se a ela as quatro
+    tabelas de dimensão (`build_dimensions`) para o modelo em estrela.
+
+    Args:
+        features: `DataFrame` Gold completo (saída de `build_features`).
+
+    Returns:
+        Cópia de `features` restrita às colunas de `DASHBOARD_COLUMNS`,
+        na mesma ordem.
+    """
+    return features[list(DASHBOARD_COLUMNS)].copy()

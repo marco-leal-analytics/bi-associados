@@ -7,6 +7,7 @@ import pandas as pd
 import pytest
 
 from src.config.settings import (
+    DASHBOARD_COLUMNS,
     DIAS_POR_ANO,
     DIM_CLASSIFICACAO,
     DIM_FAIXA_RENDA,
@@ -22,7 +23,7 @@ from src.config.settings import (
     TERCIS_MOVIMENTACAO,
 )
 from src.features.associados import add_faixa_renda, add_indicadores_relacionamento
-from src.features.consolidado import build_features
+from src.features.consolidado import build_dashboard_features, build_features
 from src.features.dimensoes import build_dimensions
 from src.features.movimentacao import IDS_NIVEL_MOVIMENTACAO
 from src.features.produtos import TOTAL_PRODUTOS_POSSIVEIS, add_indicadores_produtos
@@ -288,6 +289,26 @@ def test_dimensao_classificacao_bate_com_settings(dimensoes):
     esperado = {id_: descricao for id_, descricao in DIM_CLASSIFICACAO}
     obtido = dict(zip(dimensoes["classificacao"]["ID"], dimensoes["classificacao"]["DESCRICAO"]))
     assert obtido == esperado
+
+
+# --- Tabela reduzida para o Power BI ---
+
+
+def test_dashboard_features_contem_apenas_colunas_esperadas(features_consolidadas):
+    dashboard = build_dashboard_features(features_consolidadas)
+    assert list(dashboard.columns) == list(DASHBOARD_COLUMNS)
+
+
+def test_dashboard_features_chave_unica_e_completa(features_consolidadas):
+    dashboard = build_dashboard_features(features_consolidadas)
+    assert not dashboard[KEY_COLUMN].duplicated().any()
+    assert len(dashboard) == len(features_consolidadas)
+
+
+def test_dashboard_features_valores_batem_com_a_fato_completa(features_consolidadas):
+    dashboard = build_dashboard_features(features_consolidadas)
+    for coluna in DASHBOARD_COLUMNS:
+        pd.testing.assert_series_equal(dashboard[coluna], features_consolidadas[coluna])
 
 
 def test_ids_da_fato_existem_nas_dimensoes(features_consolidadas, dimensoes):

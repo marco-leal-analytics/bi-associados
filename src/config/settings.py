@@ -157,3 +157,28 @@ OPORTUNIDADE_POTENCIAL_CRESCIMENTO = {
     "classificacao_id": DIM_CLASSIFICACAO[1][0],  # Em Desenvolvimento
     "nivel_movimentacao_ids": {DIM_NIVEL_MOVIMENTACAO[1][0], DIM_NIVEL_MOVIMENTACAO[2][0]},  # Média, Alta
 }
+
+# Colunas da Gold efetivamente usadas pelas 4 páginas do dashboard Power BI
+# (ver docs/regras_negocio.md, seção 7, e docs/insights.md). A fato completa
+# (`features.parquet`, ~40 colunas) carrega campos intermediários do cálculo
+# (ex.: SCORE_*, NIVEL_SALDO_MEDIO_ID, colunas de produto individuais) que não
+# alimentam nenhum visual — importar tudo no Power BI infla o modelo sem
+# ganho. `build_dashboard_features` (src/features/consolidado.py) projeta só
+# estas colunas para `features_dashboard.parquet`, a fonte recomendada para o
+# import no Power BI.
+DASHBOARD_COLUMNS = (
+    "CHAVE",  # Página 1 (contagem de associados) e chave de linha
+    "AGENCIA",  # Página 2 — Associados por Agência
+    "CIDADE",  # Página 2 — Associados por Cidade
+    "RENDA_MENSAL",  # Página 1 — Renda Média
+    "FAIXA_RENDA_ID",  # Página 2 — Faixa de Renda (FK para dim_faixa_renda)
+    "SALDO_MEDIO",  # Página 1 — Saldo Médio
+    "QTD_PRODUTOS",  # Página 1 — Produtos por Associado
+    "TEMPO_RELACIONAMENTO_ANOS",  # Página 2 — Tempo de Relacionamento
+    "DATA_ASSOCIACAO_INVALIDA",  # Nota de rodapé: exclusões de tempo de relacionamento (docs/insights.md)
+    "CLASSIFICACAO_ID",  # Página 3 — FK para dim_classificacao
+    "CLASSIFICACAO_TEMPO_INDISPONIVEL",  # Transparência: score de relacionamento neutralizado
+    "FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS",  # Página 4
+    "FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO",  # Página 4
+    "FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO",  # Página 4
+)

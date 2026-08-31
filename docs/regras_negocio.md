@@ -105,3 +105,5 @@ Essas flags não são mutuamente exclusivas: um associado pode aparecer em mais 
 - **Página 2 (Relacionamento):** Associados por Agência, por Cidade (usando `CIDADE` já padronizada), por Faixa de Renda, por Tempo de Relacionamento.
 - **Página 3 (Classificação):** Distribuição percentual e quantitativa entre Inicial / Em Desenvolvimento / Maduro / Engajado.
 - **Página 4 (Oportunidades):** As três listas de oportunidade da seção 6.
+
+Nenhuma das quatro páginas usa os campos intermediários de cálculo (pilares `SCORE_*`, níveis individuais de movimentação, `INDICE_*`, colunas de produto por tipo, flags `*_INVALIDO`) — por isso o import recomendado no Power BI é `data/2_gold/features_dashboard.parquet`, a projeção de `features.parquet` só com as colunas da tabela acima (`build_dashboard_features`, `src/features/consolidado.py`; lista completa em `dicionario_dados.md`, seção 5.6), relacionada às quatro dimensões (`dim_*.parquet`, seção 6 de `dicionario_dados.md`) em modelo estrela.
