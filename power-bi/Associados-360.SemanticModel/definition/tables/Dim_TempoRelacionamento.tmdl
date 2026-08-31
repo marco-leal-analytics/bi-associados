@@ -1,0 +1,33 @@
+table Dim_TempoRelacionamento
+	lineageTag: 82679574-4bd3-4af4-b41a-4e9c63347cad
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 8077a910-6e89-43a6-8fae-7cfd178328cd
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DESCRICAO
+		dataType: string
+		lineageTag: c336b5ca-a6c7-4ca4-bc24-9dddff360e2a
+		summarizeBy: none
+		sourceColumn: DESCRICAO
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_TempoRelacionamento = m
+		mode: import
+		queryGroup: Dimensões
+		source =
+				let
+				    Fonte = Parquet.Document(File.Contents("C:\Users\Leal\Documents\portfolio\bi-associados\data\2_gold\dim_tempo_relacionamento.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Fonte
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

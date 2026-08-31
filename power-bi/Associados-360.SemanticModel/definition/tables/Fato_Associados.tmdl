@@ -138,6 +138,15 @@ table Fato_Associados
 
 		annotation SummarizationSetBy = Automatic
 
+	column TEMPO_RELACIONAMENTO_FAIXA_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 05fd13ef-698a-44a8-94f3-1aa094cc196b
+		summarizeBy: none
+		sourceColumn: TEMPO_RELACIONAMENTO_FAIXA_ID
+
+		annotation SummarizationSetBy = Automatic
+
 	partition Fato_Associados = m
 		mode: import
 		queryGroup: Fatos

@@ -11,49 +11,10 @@
         {
           "location": {
             "x": 121.20265066254498,
-            "y": 882.273228189976
+            "y": 937.23722093229287
           },
           "nodeIndex": "Dim_Classificação",
           "nodeLineageTag": "d48dc023-a484-4d71-9a13-55c62dc60335",
-          "size": {
-            "height": 128,
-            "width": 234
-          },
-          "zIndex": 4
-        },
-        {
-          "location": {
-            "x": 684.25061381584624,
-            "y": 890.72922707340922
-          },
-          "nodeIndex": "Dim_Diversificação",
-          "nodeLineageTag": "609b8200-e305-4976-b344-1b77ab2c6768",
-          "size": {
-            "height": 128,
-            "width": 234
-          },
-          "zIndex": 6
-        },
-        {
-          "location": {
-            "x": 949.92928290174063,
-            "y": 892.13856022064829
-          },
-          "nodeIndex": "Dim_FaixaRenda",
-          "nodeLineageTag": "1d818974-dc0b-4a45-8b45-7c7e6f9388a4",
-          "size": {
-            "height": 128,
-            "width": 234
-          },
-          "zIndex": 7
-        },
-        {
-          "location": {
-            "x": 415.10672435594239,
-            "y": 889.31989392617038
-          },
-          "nodeIndex": "Dim_Movimentação",
-          "nodeLineageTag": "038c228b-8127-4ca2-91c8-da3984706da3",
           "size": {
             "height": 128,
             "width": 234
@@ -62,8 +23,47 @@
         },
         {
           "location": {
+            "x": 684.25061381584624,
+            "y": 945.69321981572614
+          },
+          "nodeIndex": "Dim_Diversificação",
+          "nodeLineageTag": "609b8200-e305-4976-b344-1b77ab2c6768",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 949.92928290174063,
+            "y": 947.10255296296521
+          },
+          "nodeIndex": "Dim_FaixaRenda",
+          "nodeLineageTag": "1d818974-dc0b-4a45-8b45-7c7e6f9388a4",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 415.10672435594239,
+            "y": 944.2838866684873
+          },
+          "nodeIndex": "Dim_Movimentação",
+          "nodeLineageTag": "038c228b-8127-4ca2-91c8-da3984706da3",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
             "x": 511.84128066860751,
-            "y": 504.627971527551
+            "y": 559.591964269868
           },
           "nodeIndex": "Fato_Associados",
           "nodeLineageTag": "8e908ef7-5298-4008-a374-b0a5f0515cc4",
@@ -71,12 +71,12 @@
             "height": 300,
             "width": 234
           },
-          "zIndex": 1
+          "zIndex": 2
         },
         {
           "location": {
             "x": 203.74549393283314,
-            "y": 109.9586635030612
+            "y": 164.92265624537811
           },
           "nodeIndex": "Dim_Agências",
           "nodeLineageTag": "1e670daf-5170-41be-9d7d-ab132678f50e",
@@ -84,12 +84,12 @@
             "height": 128,
             "width": 234
           },
-          "zIndex": 2
+          "zIndex": 3
         },
         {
           "location": {
             "x": 833.03211500636257,
-            "y": 109.92798548463382
+            "y": 164.89197822695076
           },
           "nodeIndex": "Dim_Calendario",
           "nodeLineageTag": "2dd67cc9-066a-41e9-b054-d422bf8f20eb",
@@ -97,12 +97,12 @@
             "height": 300,
             "width": 234
           },
-          "zIndex": 3
+          "zIndex": 4
         },
         {
           "location": {
-            "x": 1112.7266322391956,
-            "y": 439.74794919621849
+            "x": 613.82269811662673,
+            "y": 1110.5905272819327
           },
           "nodeIndex": "_Medidas",
           "nodeLineageTag": "bb59ba53-3f78-4fd1-8b44-22a5455a6a52",
@@ -110,7 +110,20 @@
             "height": 104,
             "width": 234
           },
-          "zIndex": 0
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 1226.1973214232894,
+            "y": 943.5638810856542
+          },
+          "nodeIndex": "Dim_TempoRelacionamento",
+          "nodeLineageTag": "82679574-4bd3-4af4-b41a-4e9c63347cad",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 9
         }
       ],
       "name": "Todas as tabelas",

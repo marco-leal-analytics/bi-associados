@@ -19,3 +19,7 @@ relationship c6132923-3684-d056-d589-a989a04200c2
 	fromColumn: Fato_Associados.FAIXA_RENDA_ID
 	toColumn: Dim_FaixaRenda.ID
 
+relationship 28b37c05-7672-1aca-0cb5-61c1f1dc5379
+	fromColumn: Fato_Associados.TEMPO_RELACIONAMENTO_FAIXA_ID
+	toColumn: Dim_TempoRelacionamento.ID
+
