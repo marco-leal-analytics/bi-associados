@@ -1,6 +1,106 @@
 # bi-associados
 Associados 360 | Business Intelligence &amp; Relationship Analytics — Solução completa de BI desenvolvida com Python, Excel, Parquet e Power BI para tratamento e qualidade de dados, análise de relacionamento, classificação de associados, identificação de oportunidades e geração de insights, com arquitetura Bronze → Silver → Gold e versionamento Git.
 
+## Objetivo do Projeto
+
+Construir um pipeline analítico completo (Bronze → Silver → Gold) para consolidar as bases de Associados, Produtos e Movimentação em uma visão única — "Associados 360" —, tratando e validando a qualidade dos dados, calculando indicadores de relacionamento e diversificação de produtos, classificando os associados por um índice de percentil e identificando oportunidades comerciais (ex.: alta renda com baixa utilização de produtos), com o resultado final consumido em um dashboard Power BI.
+
+## Tecnologias Utilizadas
+
+- **Python** — linguagem principal do pipeline (ingestão, limpeza, features, classificação e orquestração).
+- **Pandas** — manipulação e transformação dos dados nas camadas Bronze, Silver e Gold.
+- **PyArrow / Parquet** — formato de armazenamento colunar das camadas Silver e Gold.
+- **Openpyxl** — leitura das planilhas Excel de origem (camada Bronze).
+- **Power BI** — dashboard final de visualização e análise de insights.
+- **Git** — versionamento do código e documentação do projeto.
+
+## Regras de Classificação e Score de Utilização de Produtos
+
+O `INDICE_CLASSIFICACAO` é um índice composto por percentil (0 a 1). Cada associado recebe uma pontuação percentual (rank 0–1) em cinco pilares, combinados por soma ponderada (20% cada, `CLASSIFICACAO_PESOS`):
+
+| Dimensão | Indicador-base | Coluna do pilar |
+|---|---|---|
+| Produtos | `INDICE_DIVERSIFICACAO` | `SCORE_PRODUTOS` |
+| Relacionamento | `TEMPO_RELACIONAMENTO_ANOS` | `SCORE_RELACIONAMENTO` |
+| Saldo | `SALDO_MEDIO` | `SCORE_SALDO` |
+| Pix Mensal | percentil de `PIX_MENSAL` | `SCORE_PIX_MENSAL` |
+| Compras no Cartão | percentil de `COMPRAS_CARTAO` | `SCORE_COMPRAS_CARTAO` |
+
+A dimensão "Utilização" pedida no desafio foi desdobrada em **Pix Mensal** (quantidade de transações) e **Compras no Cartão** (volume financeiro) em vez de um único score médio, por serem métricas de naturezas diferentes.
+
+O `INDICE_CLASSIFICACAO` é então dividido em quartis, gerando `CLASSIFICACAO_ID` (0–3) em ordem crescente de pontuação:
+
+**Inicial** (Q1) → **Em Desenvolvimento** (Q2) → **Maduro** (Q3) → **Engajado** (Q4)
+
+A distribuição resultante é balanceada (250/250/250/250 em 1000 associados), com progressão monotônica dos indicadores brutos entre as categorias — evidência de que o índice reflete uma progressão real de relacionamento. Metodologia completa, em `docs/regras_negocio.md` (seção 5).
+
+## Metodologia de Oportunidades
+
+Três flags de oportunidade são calculadas na camada Gold (`FLAG_OPORTUNIDADE_*`, não mutuamente exclusivas):
+
+| Oportunidade | Critério de negócio |
+|---|---|
+| Alta renda e poucos produtos | Faixa de renda "Acima de R$ 15.000" **e** até 2 produtos |
+| Baixa utilização dos serviços | Nível de movimentação Baixa **e** 2+ produtos (já é cliente, mas pouco ativo) |
+| Potencial de crescimento | Classificação "Em Desenvolvimento" **e** movimentação Média/Alta (poucos produtos, mas já engajado financeiramente) |
+
+Complementarmente, a Página 4 do Power BI usa uma abordagem exploratória sobre o mesmo `INDICE_CLASSIFICACAO`: uma **matriz Faixa de Renda × Classificação**, com o score médio em cada célula — renda alta e score baixo aponta visualmente o quadrante de maior oportunidade, sem exigir um limiar fixo. A matriz filtra interativamente uma tabela de associados ordenada de forma ascendente pelo score, detalhando os cinco pilares `SCORE_*` de cada um. Sobre a base atual, a célula "Acima de R$ 15.000" × "Inicial" concentra 133 associados (13,3% da base) com o menor score médio (0,33) — o mesmo público identificado pela flag `FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS`, agora navegável interativamente. Detalhes em `docs/regras_negocio.md` (seções 6–7) e `docs/insights.md`.
+
+## Passo a Passo para Execução
+
+1. **Pré-requisitos**: Python 3.10+ instalado e disponível no PATH (`python --version`), e Git para clonar/versionar o repositório.
+2. **Obter o projeto**: clone ou copie o repositório e abra um terminal na **raiz do projeto** (a pasta que contém a pasta `src/`) — todos os comandos abaixo assumem esse diretório.
+3. **Criar o ambiente virtual** (isola as dependências do projeto do Python global):
+   ```
+   python -m venv .venv
+   ```
+4. **Ativar o ambiente virtual**:
+   - Windows (cmd/PowerShell): `.venv\Scripts\activate`
+   - Linux/Mac: `source .venv/bin/activate`
+
+   O prompt do terminal passa a exibir `(.venv)` quando a ativação funciona.
+5. **Instalar as dependências** listadas em `requirements.txt` (`pandas`, `openpyxl`, `pyarrow`, `pytest`):
+   ```
+   pip install -r requirements.txt
+   ```
+6. **Conferir os dados de origem**: os arquivos Excel brutos devem existir em `data/0_bronze/` (`raw_associados.xlsx` com as abas Associados/Produtos/Movimentacao, e `raw_Dim_Calendario.xlsx`) — essa camada não é gerada pelo pipeline, é o ponto de partida.
+7. **Executar o pipeline completo** (ingestão → Silver → Gold), sempre com `-m` para o Python resolver os imports absolutos do pacote `src`:
+   ```
+   python -m src.pipeline
+   ```
+   Nunca execute com `python src/pipeline.py` nem `cd src && python pipeline.py` — sem o `-m`, o Python não encontra o pacote `src` e falha com `ModuleNotFoundError: No module named 'src'`.
+8. **Acompanhar a execução**: o log no terminal mostra timestamp, etapa (ingestão/Silver/Gold), contagem de linhas processadas e tempo total, via `src/utils/logging.py`.
+9. **Conferir os resultados gerados**, em ordem:
+   - `data/1_silver/associados.parquet`, `produtos.parquet`, `movimentacao.parquet` — camada Silver, dados tratados e validados.
+   - `data/2_gold/features.parquet` — tabela fato completa (features, score e classificação consolidados).
+   - `data/2_gold/features_dashboard.parquet` — projeção reduzida, só com as colunas usadas no Power BI.
+   - `data/2_gold/dim_faixa_renda.parquet`, `dim_tempo_relacionamento.parquet`, `dim_nivel_diversificacao.parquet`, `dim_nivel_movimentacao.parquet`, `dim_classificacao.parquet`, `dim_calendario.parquet`, `dim_agencia.parquet` — tabelas de dimensão para o modelo em estrela.
+10. **Rodar os testes automatizados** (valida qualidade, integridade referencial e regras de negócio sobre os dados gerados):
+    ```
+    pytest tests/ -q
+    ```
+11. **Abrir o dashboard**: com `data/2_gold/features_dashboard.parquet` e as dimensões `dim_*.parquet` gerados, abra o Power BI e importe/atualize essas tabelas (relacionadas por ID/data/agência conforme `docs/dicionario_dados.md`, seção 6).
+12. **Reexecutar após mudanças**: qualquer alteração nos dados brutos (`data/0_bronze/`) ou no código em `src/` exige rodar novamente o passo 7 para atualizar Silver e Gold — o pipeline sempre reprocessa do zero, não é incremental.
+
+## Estrutura dos Scripts Python
+
+- **`src/pipeline.py`** — ponto de entrada do projeto (`python -m src.pipeline`); orquestra `run_ingestion` → `run_silver` → `run_gold` em `run_pipeline()`, captura `DATA_REFERENCIA` uma única vez por rodada e registra o log de cada etapa.
+- **`src/config/settings.py`** — configuração central do projeto: caminhos (`PROJECT_ROOT`, `DATA_DIR`, `BRONZE_DIR`, `SILVER_DIR`, `GOLD_DIR`), nomes de abas/colunas esperadas, parâmetros de negócio (`FAIXAS_RENDA`, `TERCIS_MOVIMENTACAO`, `CLASSIFICACAO_PESOS`, `OPORTUNIDADE_*`) e os pares `DIM_*` usados nas tabelas de dimensão.
+- **`src/io/excel.py`** — leitura genérica das planilhas Excel de origem (`read_sheet`, `load_sources`); único ponto do projeto que lê a camada Bronze.
+- **`src/cleaning/common.py`** — funções de limpeza reutilizadas pelas três entidades: padronização de texto/categorias, validação de domínio, tratamento de nulos e duplicidades, conversão de tipos.
+- **`src/cleaning/associados.py`** — limpeza da entidade Associados: padroniza `CIDADE`, sinaliza `DATA_ASSOCIACAO` futura (`DATA_ASSOCIACAO_INVALIDA`) e trata `RENDA_MENSAL`.
+- **`src/cleaning/produtos.py`** — limpeza da entidade Produtos: valida domínio S/N, converte para booleano, valida `CHAVE` e calcula `QTD_PRODUTOS`.
+- **`src/cleaning/movimentacao.py`** — limpeza da entidade Movimentação: converte métricas numéricas e sinaliza valores inválidos por coluna.
+- **`src/features/produtos.py`** — calcula `INDICE_DIVERSIFICACAO` e `NIVEL_DIVERSIFICACAO_ID` a partir da quantidade de produtos.
+- **`src/features/associados.py`** — calcula `TEMPO_RELACIONAMENTO_DIAS/ANOS`, `FAIXA_RENDA_ID` e `TEMPO_RELACIONAMENTO_FAIXA_ID`.
+- **`src/features/movimentacao.py`** — calcula `NIVEL_MOVIMENTACAO_ID` (tercis de saldo, Pix e compras no cartão, combinados pela moda).
+- **`src/features/classificacao.py`** — calcula o `INDICE_CLASSIFICACAO` (score de utilização de produtos) e `CLASSIFICACAO_ID`, conforme a metodologia descrita acima.
+- **`src/features/oportunidades.py`** — calcula as três `FLAG_OPORTUNIDADE_*` a partir dos indicadores já consolidados.
+- **`src/features/calendario.py`** — projeta a dimensão de calendário a partir da fonte externa bruta (`raw_Dim_Calendario.xlsx`), recortando apenas o intervalo de anos necessário.
+- **`src/features/dimensoes.py`** — monta as tabelas de dimensão ID → descrição (`dim_faixa_renda`, `dim_tempo_relacionamento`, `dim_nivel_diversificacao`, `dim_nivel_movimentacao`, `dim_classificacao`) e a dimensão `dim_agencia`.
+- **`src/features/consolidado.py`** — consolida Associados, Produtos e Movimentação pela `CHAVE` (`build_features`) e monta a projeção reduzida para o dashboard (`build_dashboard_features`).
+- **`src/utils/logging.py`** — configuração central de logging (`get_logger`), usada por `src/pipeline.py` para registrar início/fim de cada etapa com contagem de linhas e tempo de execução.
+
 ## Status do Projeto (atualizado em 2026-08-31)
 
 Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pendente** (não iniciado)
