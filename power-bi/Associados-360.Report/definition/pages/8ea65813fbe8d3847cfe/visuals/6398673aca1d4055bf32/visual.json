@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "6398673aca1d4055bf32",
   "position": {
-    "x": 375.91263650546023,
-    "y": 59.906396255850233,
-    "z": 0,
-    "height": 500.21840873634943,
-    "width": 375.91263650546023,
+    "x": 245.616224648986,
+    "y": 9.98439937597504,
+    "z": 2000,
+    "height": 300.53042121684871,
+    "width": 348.45553822152891,
     "tabOrder": 0
   },
   "visual": {
@@ -27,8 +27,9 @@
                 }
               },
               "queryRef": "Dim_Agências.NOME_AGENCIA",
-              "nativeQueryRef": "NOME_AGENCIA",
-              "active": true
+              "nativeQueryRef": "Agência",
+              "active": true,
+              "displayName": "Agência"
             }
           ]
         },
@@ -51,6 +52,21 @@
           ]
         }
       }
+    },
+    "objects": {
+      "values": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "visualContainerObjects": {
       "title": [
@@ -80,7 +96,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'15'"
+                  "Value": "14D"
                 }
               }
             },

@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "71998145c7364726b9a5",
   "position": {
-    "x": 603.55694227769106,
-    "y": 501.71606864274571,
-    "z": 0,
-    "height": 217.16068642745708,
-    "width": 1055.8502340093603,
-    "tabOrder": 2
+    "x": 246.66666666666666,
+    "y": 380,
+    "z": 2000,
+    "height": 324.44444444444446,
+    "width": 1017.7777777777777,
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "tableEx",
@@ -113,10 +113,75 @@
               },
               "queryRef": "_Medidas.Tempo Médio de Relacionamento (Anos)",
               "nativeQueryRef": "Tempo Médio de Relacionamento (Anos)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Score Utilização"
+                }
+              },
+              "queryRef": "_Medidas.Score Utilização",
+              "nativeQueryRef": "Score Utilização"
             }
           ]
         }
       }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "100.88888569213515D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Medidas.Total de Associados"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "112.44442880173611D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Medidas.Produtos por Associado"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "153.11110547408762D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Medidas.Tempo Médio de Relacionamento (Anos)"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
+        }
+      ]
     }
   }
 }

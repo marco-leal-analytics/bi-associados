@@ -207,6 +207,32 @@ table Fato_Associados
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	column 'Quartil Tempo Relacionamento' =
+			
+			VAR TabelaValida =
+			    FILTER(
+			        ALL(Fato_Associados),
+			        NOT ISBLANK(Fato_Associados[TEMPO_RELACIONAMENTO_ANOS])
+			    )
+			VAR PosicaoPercentual =
+			    DIVIDE(
+			        RANKX(TabelaValida, Fato_Associados[TEMPO_RELACIONAMENTO_ANOS], , ASC),
+			        COUNTROWS(TabelaValida)
+			    )
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(Fato_Associados[TEMPO_RELACIONAMENTO_ANOS]), "Não disponível",
+			        PosicaoPercentual <= 0.25, "Q1 - Mais recentes (25%)",
+			        PosicaoPercentual <= 0.50, "Q2",
+			        PosicaoPercentual <= 0.75, "Q3",
+			        "Q4 - Mais antigos (25%)"
+			    )
+		lineageTag: 63b9ab68-c9c2-449a-afd4-c878c7488fd6
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
 	partition Fato_Associados = m
 		mode: import
 		queryGroup: Fatos

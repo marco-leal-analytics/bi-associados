@@ -1052,6 +1052,16 @@ cultureInfo pt-BR
 			            "State": "Generated",
 			            "Weight": 0.99
 			          }
+			        },
+			        {
+			          "Agência": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
 			        }
 			      ]
 			    },
@@ -2338,6 +2348,48 @@ cultureInfo pt-BR
 			          }
 			        }
 			      ]
+			    },
+			    "fato_associado.quartil_tempo_relacionamento": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Fato_Associados",
+			          "ConceptualProperty": "Quartil Tempo Relacionamento"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "quartil tempo relacionamento": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "Distribuição Quartis": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "entity__medida.score_utilização": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Score Utilização"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "score utilização": {
+			            "State": "Generated"
+			          }
+			        }
+			      ]
 			    }
 			  },
 			  "Relationships": {
@@ -2667,6 +2719,72 @@ cultureInfo pt-BR
 			          "State": "Generated",
 			          "Weight": 0.99,
 			          "ID": "dim_agências_have_fato_associados"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_entity__medida_score_utilização": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "entity__medida.score_utilização": {
+			          "Target": {
+			            "Entity": "entity__medida.score_utilização"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "entity__medida.score_utilização"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_score_utilização"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_quartil_tempo_relacionamento": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "fato_associado.quartil_tempo_relacionamento": {
+			          "Target": {
+			            "Entity": "fato_associado.quartil_tempo_relacionamento"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "fato_associado.quartil_tempo_relacionamento"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_quartil_tempo_relacionamentos"
 			        }
 			      ]
 			    },

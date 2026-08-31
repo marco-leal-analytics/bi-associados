@@ -4,7 +4,7 @@
   "position": {
     "x": 260,
     "y": 40,
-    "z": 0,
+    "z": 4000,
     "height": 160,
     "width": 225,
     "tabOrder": 0
@@ -297,23 +297,5 @@
         }
       ]
     }
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "395508299561b606adfb",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Medidas"
-              }
-            },
-            "Property": "Total de Associados"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

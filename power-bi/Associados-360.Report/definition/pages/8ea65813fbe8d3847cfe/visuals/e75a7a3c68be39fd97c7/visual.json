@@ -1,18 +1,38 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "520734c414844ad38684",
+  "name": "e75a7a3c68be39fd97c7",
   "position": {
-    "x": 750,
-    "y": 40,
-    "z": 1000,
-    "height": 160,
-    "width": 225,
-    "tabOrder": 2000
+    "x": 245.55555555555554,
+    "y": 327.77777777777777,
+    "z": 6002,
+    "height": 354.44444444444446,
+    "width": 348.88888888888886,
+    "tabOrder": 6002
   },
   "visual": {
-    "visualType": "card",
+    "visualType": "pivotTable",
     "query": {
       "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fato_Associados"
+                    }
+                  },
+                  "Property": "Quartil Tempo Relacionamento"
+                }
+              },
+              "queryRef": "Fato_Associados.Quartil Tempo Relacionamento",
+              "nativeQueryRef": "Distribuição Quartis",
+              "active": true,
+              "displayName": "Distribuição Quartis"
+            }
+          ]
+        },
         "Values": {
           "projections": [
             {
@@ -23,33 +43,49 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Saldo Médio"
+                  "Property": "Tempo Médio de Relacionamento (Anos)"
                 }
               },
-              "queryRef": "_Medidas.Saldo Médio",
-              "nativeQueryRef": "Saldo Médio"
+              "queryRef": "_Medidas.Tempo Médio de Relacionamento (Anos)",
+              "nativeQueryRef": "Tempo Médio de Relacionamento (Anos)"
             }
           ]
         }
       }
     },
     "objects": {
-      "categoryLabels": [
+      "values": [
         {
           "properties": {
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "ThemeDataColor": {
-                      "ColorId": 1,
-                      "Percent": 0
-                    }
-                  }
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
                 }
               }
             }
           }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "119.77777041513485D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Medidas.Tempo Médio de Relacionamento (Anos)"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
         }
       ]
     },
@@ -71,10 +107,31 @@
                 }
               }
             },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            },
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'15'"
+                  "Value": "14D"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Total de Associados por Agência'"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI'', wf_segoe-ui_normal, helvetica, arial, sans-serif'"
                 }
               }
             }
@@ -87,7 +144,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
@@ -290,6 +347,32 @@
               "expr": {
                 "Literal": {
                   "Value": "1D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

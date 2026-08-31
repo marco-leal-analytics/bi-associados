@@ -46,6 +46,12 @@ table _Medidas
 		displayFolder: Oportunidades
 		lineageTag: f6a9b2c5-ad3e-4f70-b14c-8d5eaf3b6c94
 
+	measure 'Score Utilização' = AVERAGE(Fato_Associados[INDICE_CLASSIFICACAO])
+		displayFolder: Médias
+		lineageTag: 82a80cec-2130-4ccb-aa01-cf713f382c98
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition _Medidas = m
 		mode: import
 		source =

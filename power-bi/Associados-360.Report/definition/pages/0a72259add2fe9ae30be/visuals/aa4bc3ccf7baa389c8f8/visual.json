@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "aa4bc3ccf7baa389c8f8",
   "position": {
-    "x": 356.44305772230888,
-    "y": 368.42433697347894,
-    "z": 1,
-    "height": 693.41653666146647,
-    "width": 1563.5569422776912,
-    "tabOrder": 7
+    "x": 231.11111111111111,
+    "y": 313.33333333333331,
+    "z": 1000,
+    "height": 390,
+    "width": 1038.8888888888889,
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "tableEx",
@@ -29,6 +29,35 @@
               "queryRef": "Fato_Associados.CHAVE",
               "nativeQueryRef": "CHAVE",
               "displayName": "CHAVE"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Score Utilização"
+                }
+              },
+              "queryRef": "_Medidas.Score Utilização",
+              "nativeQueryRef": "Score Utilização"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Classificação"
+                    }
+                  },
+                  "Property": "DESCRICAO"
+                }
+              },
+              "queryRef": "Dim_Classificação.DESCRICAO",
+              "nativeQueryRef": "Classifição Utilização",
+              "displayName": "Classifição Utilização"
             },
             {
               "field": {
@@ -199,41 +228,6 @@
               "queryRef": "Sum(Fato_Associados.SCORE_COMPRAS_CARTAO)",
               "nativeQueryRef": "Score Compra Cartão",
               "displayName": "Score Compra Cartão"
-            },
-            {
-              "field": {
-                "Aggregation": {
-                  "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "Fato_Associados"
-                        }
-                      },
-                      "Property": "INDICE_CLASSIFICACAO"
-                    }
-                  },
-                  "Function": 1
-                }
-              },
-              "queryRef": "Avg(Fato_Associados.INDICE_CLASSIFICACAO)",
-              "nativeQueryRef": "Score Utilização Produtos",
-              "displayName": "Score Utilização Produtos"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Dim_Classificação"
-                    }
-                  },
-                  "Property": "DESCRICAO"
-                }
-              },
-              "queryRef": "Dim_Classificação.DESCRICAO",
-              "nativeQueryRef": "Classifição Utilização",
-              "displayName": "Classifição Utilização"
             }
           ]
         }
@@ -242,18 +236,13 @@
         "sort": [
           {
             "field": {
-              "Aggregation": {
+              "Measure": {
                 "Expression": {
-                  "Column": {
-                    "Expression": {
-                      "SourceRef": {
-                        "Entity": "Fato_Associados"
-                      }
-                    },
-                    "Property": "INDICE_CLASSIFICACAO"
+                  "SourceRef": {
+                    "Entity": "_Medidas"
                   }
                 },
-                "Function": 1
+                "Property": "Score Utilização"
               }
             },
             "direction": "Ascending"
@@ -372,20 +361,6 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "115.66675304777556D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Avg(Fato_Associados.INDICE_CLASSIFICACAO)"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
                   "Value": "93.33335028753724D"
                 }
               }
@@ -445,7 +420,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "20D"
+                  "Value": "14D"
                 }
               }
             }

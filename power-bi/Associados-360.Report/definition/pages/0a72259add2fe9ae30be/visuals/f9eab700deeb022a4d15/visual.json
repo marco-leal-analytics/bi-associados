@@ -1,0 +1,109 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "f9eab700deeb022a4d15",
+  "position": {
+    "x": 0,
+    "y": 138.88888888888889,
+    "z": 3001,
+    "height": 581.11111111111109,
+    "width": 224.44444444444443,
+    "tabOrder": 3001
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Objetivo: identificar, de forma interativa, os associados com maior potencial de ação comercial — cruzando faixa de renda com nível de engajamento (score de utilização) para localizar o quadrante de maior oportunidade e priorizar a lista de associados a trabalhar.",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "color": "#ffffff"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Score sobe com engajamento, não com renda: de Inicial a Engajado o score praticamente dobra (0,34 → 0,66) em quase todas as faixas de renda, quase sem variação horizontal.",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "color": "#ffffff"
+                    }
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Maior oportunidade: \"Acima de R$ 15.000\" × \"Inicial\" tem o menor score (0,33) — alta renda com baixo engajamento, maior potencial de receita incremental.",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "color": "#ffffff"
+                    }
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Tabela prioriza por score: menor score = maior oportunidade, com pilares individuais (produtos, saldo, tempo etc.) como diagnóstico de causa.",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "color": "#ffffff"
+                    }
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "5D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

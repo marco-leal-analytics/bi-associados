@@ -7,7 +7,7 @@
     "z": 0,
     "height": 160,
     "width": 225,
-    "tabOrder": 1
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "card",
@@ -297,23 +297,5 @@
         }
       ]
     }
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "82b3e2563834f51468ef",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Medidas"
-              }
-            },
-            "Property": "Renda Média"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }
