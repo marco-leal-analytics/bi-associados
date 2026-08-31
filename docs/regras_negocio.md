@@ -1,6 +1,6 @@
 # Regras de Negócio
 
-Metodologia de cálculo dos indicadores, classificação de associados e critérios de oportunidade. Baseado nos exemplos do desafio técnico (`docs/orientações.docx`) e nos limiares (quartis/tercis) observados no profiling da base real — ver `qualidade_dados.md`. Os limiares abaixo são valores de referência calculados sobre a base Bronze e devem ser **recalculados sobre a base Silver/Gold já tratada** quando o pipeline for implementado.
+Metodologia de cálculo dos indicadores, classificação de associados e critérios de oportunidade. Baseado nos exemplos do desafio técnico (`docs/orientações.docx`) e nos limiares (quartis/tercis) observados no profiling da base real — ver `qualidade_dados.md`. Os limiares fixos abaixo (tercis de movimentação, faixas de renda e diversificação) foram calculados sobre a base Bronze e **validados sobre a Silver tratada** (`TERCIS_MOVIMENTACAO`, `src/config/settings.py`) — a limpeza não altera `SALDO_MEDIO`/`PIX_MENSAL`/`COMPRAS_CARTAO` (nenhum registro negativo foi encontrado, ver `qualidade_dados.md`), então os tercis recalculados sobre a Silver coincidem com os observados no Bronze. Já `CLASSIFICACAO` (seção 5) não usa limiar fixo: é recalculada dinamicamente a cada execução (percentil sobre a base corrente), continuando válida mesmo se a distribuição dos dados mudar.
 
 ## 1. Quantidade de Produtos
 
@@ -29,17 +29,19 @@ Faixas fixas definidas no desafio técnico (não são quartis calculados, são o
 
 Registros com `RENDA_MENSAL` nula não recebem faixa (categoria "Não informado") e são excluídos do denominador em análises percentuais de renda.
 
+Na implementação (`FAIXAS_RENDA`, `src/config/settings.py`), cada rótulo leva um prefixo alfabético — `"A - Até R$ 3.000"`, `"B - R$ 3.001 a R$ 8.000"`, `"C - R$ 8.001 a R$ 15.000"`, `"D - Acima de R$ 15.000"` — apenas para ordenar as faixas corretamente no Power BI; os intervalos e a regra de negócio são os mesmos da tabela acima.
+
 ## 4. Nível de Movimentação (indicador de apoio à classificação)
 
 Como os três indicadores de movimentação (`SALDO_MEDIO`, `PIX_MENSAL`, `COMPRAS_CARTAO`) têm escalas muito diferentes, cada um é primeiro classificado em Baixa/Média/Alta pelos seus próprios tercis (33º e 66º percentil), e o `NIVEL_MOVIMENTACAO` do associado é a **moda** (classificação mais frequente) entre os três; em caso de empate, prevalece a classificação de `SALDO_MEDIO` (indicador mais estável de relacionamento financeiro).
 
-Tercis de referência (calculados sobre a base Bronze — recalcular após tratamento):
+Tercis de referência (`TERCIS_MOVIMENTACAO`, `src/config/settings.py`), calculados sobre a base Bronze e confirmados idênticos sobre a Silver tratada (ver nota introdutória):
 
-| Indicador | Baixa (< P33) | Média (P33–P66) | Alta (> P66) |
+| Indicador | Baixa (≤ P33) | Média (P33–P66) | Alta (> P66) |
 |---|---|---|---|
-| SALDO_MEDIO | < 78.900 | 78.900 – 163.530 | > 163.530 |
-| PIX_MENSAL | < 32 | 32 – 66 | > 66 |
-| COMPRAS_CARTAO | < 6.745 | 6.745 – 13.131 | > 13.131 |
+| SALDO_MEDIO | ≤ 78.900 | 78.900 – 163.530 | > 163.530 |
+| PIX_MENSAL | ≤ 32 | 32 – 66 | > 66 |
+| COMPRAS_CARTAO | ≤ 6.745 | 6.745 – 13.131 | > 13.131 |
 
 ## 5. Classificação dos Associados
 
@@ -49,8 +51,10 @@ As regras sequenciais manuais descritas na primeira versão deste documento (top
 
 | Abordagem | Avaliação |
 |---|---|
-|
-| **Índice composto por percentil, com corte em quartis** *(adotada)* | Cada associado recebe uma pontuação de 0 a 1 combinando as quatro dimensões pedidas no desafio (Produtos, Relacionamento, Saldo, Utilização); a base inteira é então dividida em quartis dessa pontuação. Solução determinística entre execuções, e por construção produz quatro grupos de tamanho comparável — resolvendo o desbalanceamento das regras sequenciais. Avaliar com stakeholders, e verificar se alguma dimensão possui alguma peso maior ou preferencial, isso produzira estimativas e quebras da regras mais aderente as estratégias da Cooperativa|
+| Regras sequenciais manuais (exemplo do desafio) | Descartada: 83,1% dos associados caem na regra de fallback (ver acima) — pouco informativa para segmentar a base. |
+| Árvore de decisão (CART) supervisionada | Descartada: exige uma variável-alvo de classificação já rotulada para treinar o modelo, que é exatamente o que se está tentando definir — usar as próprias regras sequenciais como rótulo apenas herdaria o desbalanceamento acima; treinar sobre um rótulo arbitrário tornaria a árvore uma caixa-preta difícil de justificar ao negócio. |
+| Clustering (K-Means) não supervisionado | Descartada: não garante grupos de tamanho comparável nem uma ordem de negócio interpretável (os clusters não vêm rotulados "Inicial → Engajado"); é sensível à escala das variáveis e à inicialização aleatória, tornando o resultado menos determinístico entre execuções — contrário ao objetivo de reprodutibilidade do pipeline (ver `src/pipeline.py`, `run_pipeline`). |
+| **Índice composto por percentil, com corte em quartis** *(adotada)* | Cada associado recebe uma pontuação de 0 a 1 combinando as quatro dimensões pedidas no desafio (Produtos, Relacionamento, Saldo, Utilização); a base inteira é então dividida em quartis dessa pontuação. Solução determinística entre execuções (sem aleatoriedade, sem variável-alvo a definir a priori), e por construção produz quatro grupos de tamanho comparável — resolvendo o desbalanceamento das regras sequenciais e sendo diretamente interpretável ao negócio. Avaliar com stakeholders, e verificar se alguma dimensão possui algum peso maior ou preferencial, isso produzirá estimativas e quebras de regra mais aderentes às estratégias da Cooperativa. |
 
 ### 5.2 Metodologia adotada — Índice de Classificação
 
@@ -71,6 +75,8 @@ Associados com `TEMPO_RELACIONAMENTO_ANOS` nulo (data futura inválida, 37 regis
 
 **Inicial** (Q1) → **Em Desenvolvimento** (Q2) → **Maduro** (Q3) → **Engajado** (Q4)
 
+Na implementação, cada rótulo leva um prefixo alfabético — `"A - Inicial"`, `"B - Em Desenvolvimento"`, `"C - Maduro"`, `"D - Engajado"` — apenas para ordenar as categorias corretamente no Power BI, mesmo padrão de `FAIXA_RENDA` (seção 3).
+
 ### 5.3 Validação sobre a base Gold real
 
 Sobre os mesmos 1000 registros: distribuição exatamente 250/250/250/250 entre as quatro categorias (por construção dos quartis), e as médias dos cinco indicadores brutos crescem monotonicamente de Inicial para Engajado — evidência de que o índice composto captura uma progressão de relacionamento coerente, não é um artefato da fórmula:
@@ -84,13 +90,13 @@ Sobre os mesmos 1000 registros: distribuição exatamente 250/250/250/250 entre 
 
 ## 6. Critérios de Oportunidade
 
-| Oportunidade | Critério proposto |
-|---|---|
-| Alta renda e poucos produtos | FAIXA_RENDA = "Acima de R$ 15.000" **E** QTD_PRODUTOS ≤ 2 |
-| Baixa utilização dos serviços | NIVEL_MOVIMENTACAO = Baixa **E** QTD_PRODUTOS ≥ 2 (já é cliente, mas pouco ativo — diferente de "Inicial") |
-| Potencial de crescimento | CLASSIFICACAO = "Em Desenvolvimento" **E** NIVEL_MOVIMENTACAO ∈ {Média, Alta} (produtos ainda poucos, mas já engajado financeiramente) |
+| Oportunidade | Critério | Coluna na Gold |
+|---|---|---|
+| Alta renda e poucos produtos | FAIXA_RENDA = "Acima de R$ 15.000" **E** QTD_PRODUTOS ≤ 2 | `FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS` |
+| Baixa utilização dos serviços | NIVEL_MOVIMENTACAO = Baixa **E** QTD_PRODUTOS ≥ 2 (já é cliente, mas pouco ativo — diferente de "Inicial") | `FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO` |
+| Potencial de crescimento | CLASSIFICACAO = "Em Desenvolvimento" **E** NIVEL_MOVIMENTACAO ∈ {Média, Alta} (produtos ainda poucos, mas já engajado financeiramente) | `FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO` |
 
-Essas flags não são mutuamente exclusivas: um associado pode aparecer em mais de uma lista de oportunidade simultaneamente.
+Essas flags não são mutuamente exclusivas: um associado pode aparecer em mais de uma lista de oportunidade simultaneamente. Implementadas em `add_flags_oportunidade` (`src/features/oportunidades.py`), parametrizadas em `OPORTUNIDADE_*` (`src/config/settings.py`) — nesses parâmetros, `FAIXA_RENDA` e `CLASSIFICACAO` usam os rótulos prefixados da implementação (`"D - Acima de R$ 15.000"`, `"B - Em Desenvolvimento"`, ver seções 3 e 5.2), não o texto simplificado desta tabela.
 
 ## 7. Uso nas páginas do Power BI
 
