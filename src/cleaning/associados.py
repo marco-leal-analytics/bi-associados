@@ -1,3 +1,8 @@
+"""Limpeza da entidade Associados (Bronze → Silver): padronização de
+`CIDADE`, sinalização de `DATA_ASSOCIACAO` futura e tipagem canônica.
+Ver `docs/qualidade_dados.md` e `docs/regras_negocio.md` para as regras.
+"""
+
 import pandas as pd
 
 from src.cleaning.common import (
@@ -26,6 +31,34 @@ SILVER_DTYPES_ASSOCIADOS = {
 
 
 def clean_associados(df, reference_date=None):
+    """Limpa e valida a base bruta de Associados, produzindo a versão Silver.
+
+    Etapas: tipa `CHAVE`; remove duplicidade de linha e valida unicidade de
+    chave; padroniza `NOME`/`CIDADE` e normaliza as variantes de grafia de
+    `CIDADE` para o domínio canônico (validando que nenhuma variante
+    remanesceu); normaliza `DATA_ASSOCIACAO` e sinaliza datas futuras em
+    `DATA_ASSOCIACAO_INVALIDA` (sem alterar o valor original — ver
+    `docs/qualidade_dados.md`); tipa as colunas finais; e garante que só
+    `RENDA_MENSAL` contenha nulos residuais.
+
+    Args:
+        df: `DataFrame` bruto da planilha `Associados` (Bronze).
+        reference_date: Data de referência para julgar `DATA_ASSOCIACAO`
+            como futura. Se `None`, usa `pandas.Timestamp.now()`
+            normalizado. Deve ser a mesma `DATA_REFERENCIA` usada na
+            camada Gold (ver `run_pipeline` em `src/pipeline.py`), para
+            que a rodada seja consistente.
+
+    Returns:
+        `DataFrame` tratado (Silver), com `DATA_ASSOCIACAO_INVALIDA`
+        adicionada e os tipos definidos em `SILVER_DTYPES_ASSOCIADOS`.
+
+    Raises:
+        ValueError: Se houver `CHAVE` duplicada com dados divergentes
+            (`handle_duplicate_keys`), categoria de `CIDADE` fora do
+            domínio canônico (`assert_exact_categories`), ou nulo em
+            coluna não prevista (`assert_allowed_nulls`).
+    """
     df = df.copy()
 
     df[KEY_COLUMN] = df[KEY_COLUMN].astype("int64")

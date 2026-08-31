@@ -1,3 +1,8 @@
+"""Ponto de entrada do pipeline (`python -m src.pipeline`). Orquestra as
+três etapas — ingestão, Silver e Gold — sem conter regra de negócio própria;
+toda a lógica de limpeza e features vive em `src/cleaning` e `src/features`.
+"""
+
 import time
 
 import pandas as pd
@@ -27,7 +32,16 @@ GOLD_FEATURES_PATH = GOLD_DIR / "features.parquet"
 
 
 def run_ingestion(file_path=RAW_ASSOCIADOS_PATH):
-    """Lê as três planilhas da fonte Bronze, sem qualquer transformação."""
+    """Lê as três planilhas da fonte Bronze, sem qualquer transformação.
+
+    Args:
+        file_path: Caminho do arquivo Excel Bronze. Por padrão,
+            `RAW_ASSOCIADOS_PATH` (`src/config/settings.py`).
+
+    Returns:
+        Tupla `(associados, produtos, movimentacao)`, cada um um
+        `DataFrame` bruto (uma aba da planilha).
+    """
     logger.info("Ingestão iniciada: %s", file_path)
 
     sources = load_sources(file_path)
@@ -45,7 +59,21 @@ def run_ingestion(file_path=RAW_ASSOCIADOS_PATH):
 
 
 def run_silver(raw_associados, raw_produtos, raw_movimentacao, reference_date):
-    """Valida, limpa e revalida cada entidade (regras em `src/cleaning`) e persiste a Silver."""
+    """Valida, limpa e revalida cada entidade (regras em `src/cleaning`) e persiste a Silver.
+
+    Args:
+        raw_associados: `DataFrame` bruto de Associados (saída de `run_ingestion`).
+        raw_produtos: `DataFrame` bruto de Produtos.
+        raw_movimentacao: `DataFrame` bruto de Movimentacao.
+        reference_date: `DATA_REFERENCIA` da rodada, repassada a
+            `clean_associados` para sinalizar `DATA_ASSOCIACAO_INVALIDA`
+            (datas futuras). Deve ser a mesma data usada depois em
+            `run_gold`, para consistência dentro da rodada.
+
+    Returns:
+        Tupla `(associados, produtos, movimentacao)` já tratados
+        (Silver), na mesma ordem persistida em `data/1_silver/`.
+    """
     logger.info("Silver iniciada (DATA_REFERENCIA=%s)", reference_date.date())
 
     associados = clean_associados(raw_associados, reference_date=reference_date)
@@ -67,7 +95,20 @@ def run_silver(raw_associados, raw_produtos, raw_movimentacao, reference_date):
 
 
 def run_gold(associados, produtos, movimentacao, reference_date):
-    """Consolida features, classificação e indicadores analíticos (`src/features`) e persiste a Gold."""
+    """Consolida features, classificação e indicadores analíticos (`src/features`) e persiste a Gold.
+
+    Args:
+        associados: `DataFrame` Silver de Associados (saída de `run_silver`).
+        produtos: `DataFrame` Silver de Produtos.
+        movimentacao: `DataFrame` Silver de Movimentacao.
+        reference_date: `DATA_REFERENCIA` da rodada, repassada a
+            `build_features` para o cálculo de `TEMPO_RELACIONAMENTO_*`.
+            Deve ser a mesma data usada em `run_silver`.
+
+    Returns:
+        `DataFrame` Gold consolidado (uma linha por `CHAVE`), o mesmo
+        conteúdo persistido em `GOLD_FEATURES_PATH`.
+    """
     logger.info("Gold iniciada (DATA_REFERENCIA=%s)", reference_date.date())
 
     features = build_features(associados, produtos, movimentacao, reference_date=reference_date)
@@ -88,6 +129,18 @@ def run_pipeline(file_path=RAW_ASSOCIADOS_PATH, reference_date=None):
     relacionamento (Gold) usem exatamente o mesmo "hoje", tornando uma mesma
     rodada do pipeline reproduzível e passível de reexecução com data fixa
     (parâmetro `reference_date`) para depuração ou auditoria.
+
+    Args:
+        file_path: Caminho do arquivo Excel Bronze, repassado a
+            `run_ingestion`. Por padrão, `RAW_ASSOCIADOS_PATH`.
+        reference_date: Data de referência a fixar para toda a rodada. Se
+            `None`, usa `pandas.Timestamp.now()` normalizado (o caso de
+            uso normal — recalcula os indicadores baseados em data a
+            cada execução). Passar um valor explícito reproduz uma
+            rodada passada de forma determinística.
+
+    Returns:
+        `DataFrame` Gold consolidado (mesmo retorno de `run_gold`).
     """
     reference_date = reference_date or pd.Timestamp.now().normalize()
     started_at = time.perf_counter()

@@ -1,3 +1,8 @@
+"""Testes da camada Silver: tipos, domínios, nulos residuais e integridade
+referencial de Associados, Produtos e Movimentacao (`src/cleaning/*.py`),
+lidos diretamente dos parquets gerados pelo pipeline.
+"""
+
 import pandas as pd
 import pytest
 
@@ -15,20 +20,28 @@ BRONZE_ROW_COUNT = 1000
 
 @pytest.fixture(scope="module")
 def associados():
+    """Silver de Associados, lida do parquet gerado pelo pipeline."""
     return pd.read_parquet(SILVER_ASSOCIADOS_PATH)
 
 
 @pytest.fixture(scope="module")
 def produtos():
+    """Silver de Produtos, lida do parquet gerado pelo pipeline."""
     return pd.read_parquet(SILVER_PRODUTOS_PATH)
 
 
 @pytest.fixture(scope="module")
 def movimentacao():
+    """Silver de Movimentacao, lida do parquet gerado pelo pipeline."""
     return pd.read_parquet(SILVER_MOVIMENTACAO_PATH)
 
 
 def assert_unique_key(df):
+    """Verifica que KEY_COLUMN é única e que não há linha duplicada.
+
+    Args:
+        df: `DataFrame` a validar.
+    """
     assert not df[KEY_COLUMN].duplicated().any()
     assert not df.duplicated().any()
 

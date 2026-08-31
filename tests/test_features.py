@@ -1,3 +1,8 @@
+"""Testes da camada Features/Gold: indicadores de produtos, tempo de
+relacionamento, faixa de renda, consolidação, nível de movimentação,
+classificação e flags de oportunidade (`src/features/*.py`).
+"""
+
 import pandas as pd
 import pytest
 
@@ -25,24 +30,30 @@ from src.pipeline import SILVER_ASSOCIADOS_PATH, SILVER_MOVIMENTACAO_PATH, SILVE
 
 @pytest.fixture(scope="module")
 def produtos_features():
+    """Silver de Produtos com INDICE_DIVERSIFICACAO/NIVEL_DIVERSIFICACAO adicionados."""
     df = pd.read_parquet(SILVER_PRODUTOS_PATH)
     return add_indicadores_produtos(df)
 
 
 @pytest.fixture(scope="module")
 def associados_features():
+    """Silver de Associados com TEMPO_RELACIONAMENTO_DIAS/_ANOS adicionados."""
     df = pd.read_parquet(SILVER_ASSOCIADOS_PATH)
     return add_indicadores_relacionamento(df)
 
 
 @pytest.fixture(scope="module")
 def associados_faixa_renda():
+    """Silver de Associados com FAIXA_RENDA adicionada."""
     df = pd.read_parquet(SILVER_ASSOCIADOS_PATH)
     return add_faixa_renda(df)
 
 
 @pytest.fixture(scope="module")
 def features_consolidadas():
+    """Base Gold completa: Associados + Produtos + Movimentacao consolidados
+    pela CHAVE, com todos os indicadores, classificação e flags de oportunidade.
+    """
     associados = pd.read_parquet(SILVER_ASSOCIADOS_PATH)
     produtos = pd.read_parquet(SILVER_PRODUTOS_PATH)
     movimentacao = pd.read_parquet(SILVER_MOVIMENTACAO_PATH)

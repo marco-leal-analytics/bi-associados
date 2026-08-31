@@ -81,3 +81,5 @@ Levantado sobre `data/0_bronze/raw_associados.xlsx` (1000 registros por planilha
 - Nº de categorias de `CIDADE` antes/depois da padronização (7 → 5).
 - Nº de registros com `DATA_ASSOCIACAO` inválida sinalizados.
 - Nº de registros com `RENDA_MENSAL` nula (tratados ou preservados, conforme decisão adotada).
+
+**Status:** `src/utils/logging.py` (`get_logger`) e `src/pipeline.py` já registram a observabilidade estrutural da execução — início/fim de cada etapa (ingestão, Silver, Gold), contagem de linhas por entidade, caminhos gerados e tempo total (ver README, item 13.04). As métricas de qualidade específicas listadas acima (nulos por campo, duplicidades removidas, categorias de `CIDADE` antes/depois etc.) ainda não são logadas individualmente — hoje são garantidas via `ValueError` nas funções de `src/cleaning/*.py` (que interrompem o pipeline em caso de violação) e cobertas pelos testes (`tests/test_silver.py`, `tests/test_features.py`), não por um relatório de métricas dedicado.

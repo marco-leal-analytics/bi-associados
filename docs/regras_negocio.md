@@ -13,7 +13,7 @@ Metodologia de cálculo dos indicadores, classificação de associados e critér
 
 **Fórmula:** `DATA_REFERENCIA − DATA_ASSOCIACAO`, em dias e convertido para anos (`dias / 365,25`).
 
-- `DATA_REFERENCIA` = data de execução do pipeline (não uma data fixa no código, para o indicador continuar válido a cada nova rodada).
+- `DATA_REFERENCIA` = data de execução do pipeline (não uma data fixa no código, para o indicador continuar válido a cada nova rodada). Capturada uma única vez em `run_pipeline()` (`src/pipeline.py`) e propagada tanto para a sinalização de `DATA_ASSOCIACAO_INVALIDA` (Silver) quanto para o cálculo de `TEMPO_RELACIONAMENTO_*` (Gold), garantindo que as duas etapas usem o mesmo "hoje" dentro de uma mesma rodada; pode ser fixada explicitamente (`reference_date`) para reexecução reprodutível.
 - Registros com `DATA_ASSOCIACAO` futura (37 na base atual) têm tempo de relacionamento tratado como nulo/inválido (ver `qualidade_dados.md`) e não entram no cálculo de médias nem na classificação por tempo.
 
 ## 3. Faixa de Renda
