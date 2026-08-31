@@ -110,9 +110,10 @@ Gerados por `run_silver()` (`src/pipeline.py`), que aplica `clean_associados`/`c
 | SCORE_PRODUTOS | Percentil (rank pct) de INDICE_DIVERSIFICACAO | float (0–1) | Pilar "Produtos" do índice composto |
 | SCORE_RELACIONAMENTO | Percentil de TEMPO_RELACIONAMENTO_ANOS; 0,5 (neutro) se nulo | Float64 (0–1) | Pilar "Relacionamento" |
 | SCORE_SALDO | Percentil de SALDO_MEDIO | float (0–1) | Pilar "Saldo" |
-| SCORE_UTILIZACAO | Média dos percentis de PIX_MENSAL e COMPRAS_CARTAO | float (0–1) | Pilar "Utilização" |
+| SCORE_PIX_MENSAL | Percentil (rank pct) de PIX_MENSAL | float (0–1) | Pilar "Pix Mensal" (quantidade de transações) |
+| SCORE_COMPRAS_CARTAO | Percentil (rank pct) de COMPRAS_CARTAO | float (0–1) | Pilar "Compras no Cartão" (volume financeiro) |
 | CLASSIFICACAO_TEMPO_INDISPONIVEL | True quando TEMPO_RELACIONAMENTO_ANOS é nulo (SCORE_RELACIONAMENTO neutralizado) | bool | Sinalização de transparência — mesma lógica de DATA_ASSOCIACAO_INVALIDA |
-| INDICE_CLASSIFICACAO | Soma ponderada dos quatro SCORE_* (`CLASSIFICACAO_PESOS`, 25% cada por padrão) | Float64 (0–1) | Índice composto de classificação |
+| INDICE_CLASSIFICACAO | Soma ponderada dos cinco SCORE_* (`CLASSIFICACAO_PESOS`, 20% cada por padrão) | Float64 (0–1) | Índice composto de classificação |
 | CLASSIFICACAO_ID | INDICE_CLASSIFICACAO cortado em quartis (`DIM_CLASSIFICACAO`) | int64 (0–3) | FK para `dim_classificacao` (seção 6.4) |
 
 ### 5.5 Flags de oportunidade (`src/features/oportunidades.py`)

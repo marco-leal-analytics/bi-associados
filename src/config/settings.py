@@ -129,13 +129,17 @@ DIM_CLASSIFICACAO = (
 CLASSIFICACAO_IDS = tuple(id_ for id_, _ in DIM_CLASSIFICACAO)
 
 # Pesos de cada pilar na soma ponderada que forma INDICE_CLASSIFICACAO.
-# Devem somar 1.0; 25% cada por padrão (nenhuma dimensão priorizada no
-# desafio) — ver docs/regras_negocio.md (seção 5.2).
+# Devem somar 1.0; 20% cada por padrão (nenhuma dimensão priorizada no
+# desafio) — ver docs/regras_negocio.md (seção 5.2). PIX_MENSAL (quantidade
+# de transações) e COMPRAS_CARTAO (volume financeiro no cartão) são bases
+# distintas e por isso viraram pilares próprios em vez de um único
+# "utilização" médio entre as duas.
 CLASSIFICACAO_PESOS = {
-    "produtos": 0.25,
-    "relacionamento": 0.25,
-    "saldo": 0.25,
-    "utilizacao": 0.25,
+    "produtos": 0.20,
+    "relacionamento": 0.20,
+    "saldo": 0.20,
+    "pix_mensal": 0.20,
+    "compras_cartao": 0.20,
 }
 
 # Critérios das três flags de oportunidade (src/features/oportunidades.py,

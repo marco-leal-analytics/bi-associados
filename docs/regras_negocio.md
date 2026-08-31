@@ -52,20 +52,23 @@ As regras sequenciais manuais descritas na primeira versão deste documento (top
 | Abordagem | Avaliação |
 |---|---|
 |
-| **Índice composto por percentil, com corte em quartis** *(adotada)* | Cada associado recebe uma pontuação de 0 a 1 combinando as quatro dimensões pedidas no desafio (Produtos, Relacionamento, Saldo, Utilização); a base inteira é então dividida em quartis dessa pontuação. Solução determinística entre execuções (sem aleatoriedade, sem variável-alvo a definir a priori), e por construção produz quatro grupos de tamanho comparável — resolvendo o desbalanceamento das regras sequenciais e sendo diretamente interpretável ao negócio. Avaliar com stakeholders, e verificar se alguma dimensão possui algum peso maior ou preferencial, isso produzirá estimativas e quebras de regra mais aderentes às estratégias da Cooperativa. |
+| **Índice composto por percentil, com corte em quartis** *(adotada)* | Cada associado recebe uma pontuação de 0 a 1 combinando as dimensões pedidas no desafio (Produtos, Relacionamento, Saldo, Utilização — esta última desdobrada em Pix Mensal e Compras no Cartão, ver seção 5.2); a base inteira é então dividida em quartis dessa pontuação. Solução determinística entre execuções (sem aleatoriedade, sem variável-alvo a definir a priori), e por construção produz quatro grupos de tamanho comparável — resolvendo o desbalanceamento das regras sequenciais e sendo diretamente interpretável ao negócio. Avaliar com stakeholders, e verificar se alguma dimensão possui algum peso maior ou preferencial, isso produzirá estimativas e quebras de regra mais aderentes às estratégias da Cooperativa. |
 
 ### 5.2 Metodologia adotada — Índice de Classificação
 
-Cada associado recebe uma pontuação por **percentil (rank percentual, 0 a 1)** em cada uma das quatro dimensões pedidas:
+Cada associado recebe uma pontuação por **percentil (rank percentual, 0 a 1)** em cada uma das cinco dimensões:
 
 | Dimensão | Indicador-base | Coluna do pilar |
 |---|---|---|
 | Produtos | `INDICE_DIVERSIFICACAO` (item 1) | `SCORE_PRODUTOS` |
 | Relacionamento | `TEMPO_RELACIONAMENTO_ANOS` (item 2) | `SCORE_RELACIONAMENTO` |
 | Saldo | `SALDO_MEDIO` | `SCORE_SALDO` |
-| Utilização | média do percentil de `PIX_MENSAL` e `COMPRAS_CARTAO` | `SCORE_UTILIZACAO` |
+| Pix Mensal | percentil de `PIX_MENSAL` | `SCORE_PIX_MENSAL` |
+| Compras no Cartão | percentil de `COMPRAS_CARTAO` | `SCORE_COMPRAS_CARTAO` |
 
-`INDICE_CLASSIFICACAO` = soma ponderada dos quatro pilares, pesos em `CLASSIFICACAO_PESOS` (`src/config/settings.py`) — 25% cada por padrão, já que nenhuma das quatro dimensões tem prioridade documentada sobre as demais no desafio.
+A dimensão "Utilização" do desafio original foi desdobrada em dois pilares independentes — Pix Mensal e Compras no Cartão — em vez de um único score médio entre os dois. `PIX_MENSAL` é uma métrica de **quantidade** (número de transações no mês) e `COMPRAS_CARTAO` é uma métrica de **volume financeiro** (valor movimentado no cartão); são bases de naturezas distintas, e uma média entre percentis de bases distintas mascarava a contribuição individual de cada uma ao índice.
+
+`INDICE_CLASSIFICACAO` = soma ponderada dos cinco pilares, pesos em `CLASSIFICACAO_PESOS` (`src/config/settings.py`) — 20% cada por padrão, já que nenhuma das cinco dimensões tem prioridade documentada sobre as demais no desafio.
 
 Associados com `TEMPO_RELACIONAMENTO_ANOS` nulo (data futura inválida, 37 registros — ver seção 2) recebem `SCORE_RELACIONAMENTO = 0,5` (mediana neutra), para não penalizar nem favorecer artificialmente o índice, com sinalização `CLASSIFICACAO_TEMPO_INDISPONIVEL = True` para transparência no dashboard — mesma lógica de transparência já usada em `DATA_ASSOCIACAO_INVALIDA`.
 
