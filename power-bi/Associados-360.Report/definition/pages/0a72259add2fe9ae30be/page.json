@@ -1,10 +1,10 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
-  "name": "dd8ba2ab1ad159a34c93",
-  "displayName": "Visão Geral",
+  "name": "0a72259add2fe9ae30be",
+  "displayName": "Página 4",
   "displayOption": "FitToPage",
-  "height": 720,
-  "width": 1280,
+  "height": 1080,
+  "width": 1920,
   "objects": {
     "background": [
       {
@@ -23,14 +23,14 @@
                   "ResourcePackageItem": {
                     "PackageName": "RegisteredResources",
                     "PackageType": 1,
-                    "ItemName": "Slide17069504403094167.PNG"
+                    "ItemName": "Slide111485341716521169.PNG"
                   }
                 }
               },
               "scaling": {
                 "expr": {
                   "Literal": {
-                    "Value": "'Normal'"
+                    "Value": "'Fill'"
                   }
                 }
               }

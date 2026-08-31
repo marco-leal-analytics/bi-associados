@@ -21,6 +21,11 @@ table _Medidas
 		displayFolder: #Contagens
 		lineageTag: b3a9cbde-c4a9-4c56-9a37-171e62d0613b
 
+	measure 'Tempo Médio de Relacionamento (Anos)' = AVERAGE(Fato_Associados[TEMPO_RELACIONAMENTO_ANOS])
+		formatString: #,##0.00
+		displayFolder: Médias
+		lineageTag: 6f2ba6e3-9a9d-4a4f-8d61-3ea8b74a5b12
+
 	partition _Medidas = m
 		mode: import
 		source =

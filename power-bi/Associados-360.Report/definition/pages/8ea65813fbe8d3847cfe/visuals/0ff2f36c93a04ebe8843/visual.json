@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "0ff2f36c93a04ebe8843",
+  "position": {
+    "x": 385,
+    "y": 1030,
+    "z": 0,
+    "width": 1495,
+    "height": 40,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "37 associados possuem DATA_ASSOCIACAO futura (DATA_ASSOCIACAO_INVALIDA) e são excluídos do Tempo Médio de Relacionamento e do gráfico por Ano de Associação."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

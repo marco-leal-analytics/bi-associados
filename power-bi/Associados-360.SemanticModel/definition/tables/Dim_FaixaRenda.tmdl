@@ -15,6 +15,9 @@ table Dim_FaixaRenda
 		lineageTag: 23d5c0d6-afbe-4232-a1c7-b52d3a41158d
 		summarizeBy: none
 		sourceColumn: DESCRICAO
+		sortByColumn: ID
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 

@@ -15,6 +15,9 @@ table Dim_Classificação
 		lineageTag: af7b5e8a-2039-4259-a884-96e6273b2ad6
 		summarizeBy: none
 		sourceColumn: DESCRICAO
+		sortByColumn: ID
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 

@@ -1,16 +1,16 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "fada64b0f8924d74afff",
+  "name": "dc036f7900074206a2d7",
   "position": {
-    "x": 760,
-    "y": 240,
+    "x": 385,
+    "y": 420,
     "z": 0,
-    "height": 400,
-    "width": 460,
-    "tabOrder": 5
+    "height": 320,
+    "width": 1495,
+    "tabOrder": 2
   },
   "visual": {
-    "visualType": "clusteredColumnChart",
+    "visualType": "clusteredBarChart",
     "query": {
       "queryState": {
         "Category": {
@@ -20,15 +20,16 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Fato_Associados"
+                      "Entity": "Dim_FaixaRenda"
                     }
                   },
-                  "Property": "QTD_PRODUTOS"
+                  "Property": "DESCRICAO"
                 }
               },
-              "queryRef": "Fato_Associados.QTD_PRODUTOS",
-              "nativeQueryRef": "QTD_PRODUTOS",
-              "active": true
+              "queryRef": "Dim_FaixaRenda.DESCRICAO",
+              "nativeQueryRef": "Faixa de Renda",
+              "active": true,
+              "displayName": "Faixa de Renda"
             }
           ]
         },
@@ -42,11 +43,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Saldo Médio"
+                  "Property": "Total de Associados"
                 }
               },
-              "queryRef": "_Medidas.Saldo Médio",
-              "nativeQueryRef": "Saldo Médio"
+              "queryRef": "_Medidas.Total de Associados",
+              "nativeQueryRef": "Total de Associados"
             }
           ]
         }
