@@ -124,7 +124,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Total de Associados por Agência'"
+                  "Value": "'Tempo de relacionamento médio por quartil'"
                 }
               }
             },
