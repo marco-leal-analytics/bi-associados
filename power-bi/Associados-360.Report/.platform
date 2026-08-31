@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Associados-360"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "ce707316-190b-4ca5-b642-ff8e2ce9a868"
+  }
+}

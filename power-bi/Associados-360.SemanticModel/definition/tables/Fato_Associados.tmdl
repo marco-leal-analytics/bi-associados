@@ -1,0 +1,158 @@
+table Fato_Associados
+	lineageTag: 8e908ef7-5298-4008-a374-b0a5f0515cc4
+
+	column CHAVE
+		dataType: int64
+		formatString: 0
+		lineageTag: 4b852a87-dfcb-49f3-8c88-ef61465953fe
+		summarizeBy: sum
+		sourceColumn: CHAVE
+
+		annotation SummarizationSetBy = Automatic
+
+	column AGENCIA
+		dataType: int64
+		formatString: 0
+		lineageTag: fed2fb40-a1fb-41ad-9344-1f6d270b28c1
+		summarizeBy: sum
+		sourceColumn: AGENCIA
+
+		annotation SummarizationSetBy = Automatic
+
+	column CIDADE
+		dataType: string
+		lineageTag: 26cdb573-f89d-469c-80d4-48c2874337ee
+		summarizeBy: none
+		sourceColumn: CIDADE
+
+		annotation SummarizationSetBy = Automatic
+
+	column RENDA_MENSAL
+		dataType: double
+		lineageTag: 9ad41e72-f513-40b9-897e-cf4741a98c6e
+		summarizeBy: sum
+		sourceColumn: RENDA_MENSAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column FAIXA_RENDA_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: f1119a85-e107-4a36-bb71-099ecfa1d7e3
+		summarizeBy: count
+		sourceColumn: FAIXA_RENDA_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column SALDO_MEDIO
+		dataType: double
+		lineageTag: 73764fa9-17a0-449a-bf59-62bb04baca76
+		summarizeBy: sum
+		sourceColumn: SALDO_MEDIO
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column QTD_PRODUTOS
+		dataType: int64
+		formatString: 0
+		lineageTag: e0e6d477-b228-4a8c-9f79-513d0710d09e
+		summarizeBy: sum
+		sourceColumn: QTD_PRODUTOS
+
+		annotation SummarizationSetBy = Automatic
+
+	column DATA_ASSOCIACAO
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6eb53853-6af3-486f-b2c0-94d9d36f812e
+		summarizeBy: none
+		sourceColumn: DATA_ASSOCIACAO
+
+		variation Variation
+			isDefault
+			relationship: 023fcc9f-eeb3-4e3e-a3dc-627b107486f5
+			defaultHierarchy: LocalDateTable_97de0c04-1a7d-4548-85f0-3697b30628a4.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column TEMPO_RELACIONAMENTO_ANOS
+		dataType: double
+		lineageTag: 9c230137-2cab-4efd-a112-ff86f7ef0652
+		summarizeBy: sum
+		sourceColumn: TEMPO_RELACIONAMENTO_ANOS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DATA_ASSOCIACAO_INVALIDA
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9de30413-3816-411d-b64b-ffbbba0ef5bb
+		summarizeBy: none
+		sourceColumn: DATA_ASSOCIACAO_INVALIDA
+
+		annotation SummarizationSetBy = Automatic
+
+	column CLASSIFICACAO_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 42e7ebaa-80ba-4da9-86bd-5633b8ad6f6f
+		summarizeBy: count
+		sourceColumn: CLASSIFICACAO_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CLASSIFICACAO_TEMPO_INDISPONIVEL
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 4349a4be-d386-4e9f-adb4-5b5c422d9114
+		summarizeBy: none
+		sourceColumn: CLASSIFICACAO_TEMPO_INDISPONIVEL
+
+		annotation SummarizationSetBy = Automatic
+
+	column FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d0c2d938-87a3-4bcf-a4d4-ed21bd19c4ec
+		summarizeBy: none
+		sourceColumn: FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS
+
+		annotation SummarizationSetBy = Automatic
+
+	column FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 269e96b3-8dba-4b36-a4a6-f1290e2c38d2
+		summarizeBy: none
+		sourceColumn: FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO
+
+		annotation SummarizationSetBy = Automatic
+
+	column FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1ca0c3f6-562d-471f-85ea-b4937740f7fd
+		summarizeBy: none
+		sourceColumn: FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fato_Associados = m
+		mode: import
+		queryGroup: Fatos
+		source =
+				let
+				    Fonte = Parquet.Document(File.Contents("C:\Users\Leal\Documents\portfolio\bi-associados\data\2_gold\features_dashboard.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Fonte
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

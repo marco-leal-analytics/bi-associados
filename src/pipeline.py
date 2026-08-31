@@ -18,6 +18,7 @@ from src.config.settings import (
     SHEET_PRODUTOS,
     SILVER_DIR,
 )
+from src.features.calendario import build_dim_calendario
 from src.features.consolidado import build_dashboard_features, build_features
 from src.features.dimensoes import build_dimensions
 from src.io.excel import load_sources
@@ -37,6 +38,7 @@ GOLD_DIM_PATHS = {
     "nivel_movimentacao": GOLD_DIR / "dim_nivel_movimentacao.parquet",
     "classificacao": GOLD_DIR / "dim_classificacao.parquet",
 }
+GOLD_DIM_CALENDARIO_PATH = GOLD_DIR / "dim_calendario.parquet"
 
 
 def run_ingestion(file_path=RAW_ASSOCIADOS_PATH):
@@ -116,30 +118,35 @@ def run_gold(associados, produtos, movimentacao, reference_date):
     Returns:
         `DataFrame` Gold consolidado (uma linha por `CHAVE`), o mesmo
         conteúdo persistido em `GOLD_FEATURES_PATH`. As tabelas de
-        dimensão (`dim_*.parquet`, ver `GOLD_DIM_PATHS`) e a tabela
-        reduzida para o Power BI (`GOLD_FEATURES_DASHBOARD_PATH`) são
-        persistidas como efeito colateral, mas não fazem parte do retorno.
+        dimensão (`dim_*.parquet`, ver `GOLD_DIM_PATHS` e
+        `GOLD_DIM_CALENDARIO_PATH`) e a tabela reduzida para o Power BI
+        (`GOLD_FEATURES_DASHBOARD_PATH`) são persistidas como efeito
+        colateral, mas não fazem parte do retorno.
     """
     logger.info("Gold iniciada (DATA_REFERENCIA=%s)", reference_date.date())
 
     features = build_features(associados, produtos, movimentacao, reference_date=reference_date)
     dashboard_features = build_dashboard_features(features)
     dimensions = build_dimensions()
+    dim_calendario = build_dim_calendario(associados, reference_date)
 
     GOLD_DIR.mkdir(parents=True, exist_ok=True)
     features.to_parquet(GOLD_FEATURES_PATH, index=False)
     dashboard_features.to_parquet(GOLD_FEATURES_DASHBOARD_PATH, index=False)
     for name, dim in dimensions.items():
         dim.to_parquet(GOLD_DIM_PATHS[name], index=False)
+    dim_calendario.to_parquet(GOLD_DIM_CALENDARIO_PATH, index=False)
 
     logger.info(
-        "Gold concluída: %s (%d linhas, %d colunas), %s (%d colunas), %d dimensões",
+        "Gold concluída: %s (%d linhas, %d colunas), %s (%d colunas), %d dimensões, %s (%d linhas)",
         GOLD_FEATURES_PATH,
         len(features),
         len(features.columns),
         GOLD_FEATURES_DASHBOARD_PATH,
         len(dashboard_features.columns),
         len(dimensions),
+        GOLD_DIM_CALENDARIO_PATH,
+        len(dim_calendario),
     )
     return features
 

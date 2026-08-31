@@ -174,6 +174,7 @@ DASHBOARD_COLUMNS = (
     "FAIXA_RENDA_ID",  # Página 2 — Faixa de Renda (FK para dim_faixa_renda)
     "SALDO_MEDIO",  # Página 1 — Saldo Médio
     "QTD_PRODUTOS",  # Página 1 — Produtos por Associado
+    "DATA_ASSOCIACAO",  # Página 2 — FK para dim_calendario (associados por ano/mês de entrada)
     "TEMPO_RELACIONAMENTO_ANOS",  # Página 2 — Tempo de Relacionamento
     "DATA_ASSOCIACAO_INVALIDA",  # Nota de rodapé: exclusões de tempo de relacionamento (docs/insights.md)
     "CLASSIFICACAO_ID",  # Página 3 — FK para dim_classificacao
@@ -182,3 +183,34 @@ DASHBOARD_COLUMNS = (
     "FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO",  # Página 4
     "FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO",  # Página 4
 )
+
+# --- Dimensão Calendário (fonte externa, data/0_bronze/raw_Dim_Calendario.xlsx) ---
+RAW_DIM_CALENDARIO_PATH = BRONZE_DIR / "raw_Dim_Calendario.xlsx"
+SHEET_DIM_CALENDARIO = "Dim_Calendario"
+
+# Colunas mantidas da Dim_Calendario bruta (45 colunas, ~28.850 linhas, anos
+# 2000-2078) para a dimensão de data usada no projeto. A fonte traz
+# granularidade de dia da semana, feriado, bimestre e quadrimestre — nenhuma
+# das 4 páginas do dashboard (docs/regras_negocio.md, seção 7) analisa nesse
+# nível; a única necessidade é relacionar DATA_ASSOCIACAO por ano/mês/
+# trimestre/semestre (ex.: associados por ano de entrada, Página 2), então a
+# dimensão fica reduzida ao necessário.
+DIM_CALENDARIO_COLUNAS = (
+    "DATA",
+    "ANO",
+    "MES",
+    "NOME_MES",
+    "NOME_MES_ABREVIADO",
+    "ANO_MES",
+    "TRIMESTRE",
+    "NOME_TRIMESTRE",
+    "SEMESTRE",
+    "NOME_SEMESTRE",
+)
+
+# Anos de folga antes/depois do intervalo observado em DATA_ASSOCIACAO (e da
+# DATA_REFERENCIA da rodada) ao filtrar a Dim_Calendario — evita relacionamento
+# órfão na fato se a fonte for regenerada com datas fora do intervalo atual
+# (2018-2026, ver docs/qualidade_dados.md), sem carregar as 79 safras
+# completas do arquivo bruto.
+CALENDARIO_ANOS_BUFFER = 1

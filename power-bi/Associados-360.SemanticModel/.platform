@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Associados-360"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "d65712fc-9ab0-4a5e-aba5-924cb2eb5551"
+  }
+}

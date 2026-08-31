@@ -128,7 +128,7 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 
 ### 5.6 Tabela reduzida para o Power BI (`features_dashboard.parquet`)
 
-`data/2_gold/features_dashboard.parquet`: projeção de `features.parquet` (seção 5) só com as colunas que alimentam algum visual das 4 páginas do dashboard (`regras_negocio.md`, seção 7), gerada por `build_dashboard_features` (`src/features/consolidado.py`) a partir de `DASHBOARD_COLUMNS` (`src/config/settings.py`) e persistida por `run_gold` (`src/pipeline.py`). 1000 linhas × 14 colunas, contra 39 colunas da fato completa — os campos deixados de fora são todos intermediários de cálculo (pilares `SCORE_*`, níveis individuais de movimentação, `INDICE_*`, colunas de produto por tipo, flags `*_INVALIDO` de qualidade) que já foram consumidos para produzir `CLASSIFICACAO_ID`/`FLAG_OPORTUNIDADE_*` e não têm visual próprio no desafio. Esta é a tabela recomendada para o import no Power BI (junto das quatro dimensões da seção 6); `features.parquet` continua disponível como fato completa/auditável.
+`data/2_gold/features_dashboard.parquet`: projeção de `features.parquet` (seção 5) só com as colunas que alimentam algum visual das 4 páginas do dashboard (`regras_negocio.md`, seção 7), gerada por `build_dashboard_features` (`src/features/consolidado.py`) a partir de `DASHBOARD_COLUMNS` (`src/config/settings.py`) e persistida por `run_gold` (`src/pipeline.py`). 1000 linhas × 15 colunas, contra 40 colunas da fato completa — os campos deixados de fora são todos intermediários de cálculo (pilares `SCORE_*`, níveis individuais de movimentação, `INDICE_*`, colunas de produto por tipo, flags `*_INVALIDO` de qualidade) que já foram consumidos para produzir `CLASSIFICACAO_ID`/`FLAG_OPORTUNIDADE_*` e não têm visual próprio no desafio. Esta é a tabela recomendada para o import no Power BI (junto das quatro dimensões `dim_*_id` e da `dim_calendario`, seção 6); `features.parquet` continua disponível como fato completa/auditável.
 
 | Coluna | Página que usa | Papel |
 |---|---|---|
@@ -139,6 +139,7 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 | FAIXA_RENDA_ID | Página 2 | FK para `dim_faixa_renda` |
 | SALDO_MEDIO | Página 1 | Saldo Médio |
 | QTD_PRODUTOS | Página 1 | Produtos por Associado |
+| DATA_ASSOCIACAO | Página 2 | FK para `dim_calendario` (associados por ano/mês de entrada) |
 | TEMPO_RELACIONAMENTO_ANOS | Página 2 | Tempo de Relacionamento |
 | DATA_ASSOCIACAO_INVALIDA | Todas (nota de rodapé) | Sinaliza os 37 registros excluídos do cálculo de tempo — ver `insights.md` |
 | CLASSIFICACAO_ID | Página 3 | FK para `dim_classificacao` |
@@ -189,6 +190,30 @@ Compartilhada por `NIVEL_SALDO_MEDIO_ID`, `NIVEL_PIX_MENSAL_ID`, `NIVEL_COMPRAS_
 | 3 | Engajado |
 
 A ordem crescente do ID já reflete a ordem de negócio (pior → melhor) em todas as quatro dimensões — útil para ordenar eixos/legendas no Power BI sem depender de texto.
+
+### 6.5 `dim_calendario.parquet`
+
+Única dimensão da Gold que não vem de `DIM_*` (`src/config/settings.py`) nem de cálculo sobre os dados dos associados: é a projeção de uma fonte externa bruta, `data/0_bronze/raw_Dim_Calendario.xlsx` (aba `Dim_Calendario`, 45 colunas, ~28.850 linhas, anos 2000–2078, mais uma aba `Dim_Feriado` não utilizada neste projeto).
+
+`build_dim_calendario` (`src/features/calendario.py`) lê a fonte bruta e reduz o resultado em duas dimensões:
+
+- **Colunas**: das 45 originais (granularidade de dia da semana, feriado, bimestre, quadrimestre), mantém só as 10 em `DIM_CALENDARIO_COLUNAS` — nenhuma das 4 páginas do dashboard (`regras_negocio.md`, seção 7) precisa de granularidade diária/semanal/feriado; a única necessidade é agrupar `DATA_ASSOCIACAO` por ano/mês/trimestre/semestre (Página 2).
+- **Linhas**: das ~79 safras completas (2000–2078), mantém só os anos entre `min(ANO(DATA_ASSOCIACAO), ANO(DATA_REFERENCIA))` e `max(ANO(DATA_ASSOCIACAO), ANO(DATA_REFERENCIA))`, com uma folga de `CALENDARIO_ANOS_BUFFER` (1 ano) para cada lado — evita relacionamento órfão se a base de associados for regenerada com datas um pouco fora do intervalo atual (2018–2026), sem carregar as safras completas do arquivo bruto. A função levanta `ValueError` se a fonte bruta não cobrir algum ano necessário.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| DATA | datetime (date) | Chave da dimensão — relaciona com `DASHBOARD_COLUMNS.DATA_ASSOCIACAO` na fato (`features_dashboard.parquet`) |
+| ANO | int64 | Ano da data |
+| MES | int64 | Mês (1–12) — também serve de coluna de ordenação para `NOME_MES` no Power BI |
+| NOME_MES | string | Nome do mês por extenso ("Janeiro" ... "Dezembro") |
+| NOME_MES_ABREVIADO | string | Nome do mês abreviado ("Jan" ... "Dez") |
+| ANO_MES | string | Rótulo "MM/AAAA", útil como eixo contínuo de meses |
+| TRIMESTRE | int64 | Trimestre (1–4) — ordenação de `NOME_TRIMESTRE` |
+| NOME_TRIMESTRE | string | "T1" a "T4" |
+| SEMESTRE | int64 | Semestre (1–2) — ordenação de `NOME_SEMESTRE` |
+| NOME_SEMESTRE | string | "S1"/"S2" |
+
+Diferente das quatro dimensões acima (FK por `*_ID` inteiro), o relacionamento desta dimensão com a fato é por data (`DATA` ↔ `DATA_ASSOCIACAO`), padrão usual de tabela calendário no Power BI.
 
 ## Observação sobre os dados
 

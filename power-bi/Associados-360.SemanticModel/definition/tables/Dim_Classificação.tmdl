@@ -1,0 +1,33 @@
+table Dim_Classificação
+	lineageTag: d48dc023-a484-4d71-9a13-55c62dc60335
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: dd5c6923-5418-4e89-950c-fbf42a59d5af
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DESCRICAO
+		dataType: string
+		lineageTag: af7b5e8a-2039-4259-a884-96e6273b2ad6
+		summarizeBy: none
+		sourceColumn: DESCRICAO
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Classificação = m
+		mode: import
+		queryGroup: Dimensões
+		source =
+				let
+				    Fonte = Parquet.Document(File.Contents("C:\Users\Leal\Documents\portfolio\bi-associados\data\2_gold\dim_classificacao.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Fonte
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

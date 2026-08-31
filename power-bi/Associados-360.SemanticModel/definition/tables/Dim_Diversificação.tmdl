@@ -1,0 +1,33 @@
+table Dim_Diversificação
+	lineageTag: 609b8200-e305-4976-b344-1b77ab2c6768
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 39e7bc96-345c-4db2-8fc2-bff7094a3862
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DESCRICAO
+		dataType: string
+		lineageTag: 26f70e11-3e68-45e3-b383-5533964cfe67
+		summarizeBy: none
+		sourceColumn: DESCRICAO
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Diversificação = m
+		mode: import
+		queryGroup: Dimensões
+		source =
+				let
+				    Fonte = Parquet.Document(File.Contents("C:\Users\Leal\Documents\portfolio\bi-associados\data\2_gold\dim_nivel_diversificacao.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Fonte
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

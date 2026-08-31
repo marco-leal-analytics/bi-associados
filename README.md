@@ -136,6 +136,7 @@ O comando acima gera/atualiza, em ordem:
 - `data/2_gold/features.parquet` (tabela fato completa — features/classificação consolidadas, faixas/classes como ID)
 - `data/2_gold/features_dashboard.parquet` (tabela fato reduzida, só as colunas usadas pelas 4 páginas do Power BI — ver `docs/dicionario_dados.md` seção 5.6)
 - `data/2_gold/dim_faixa_renda.parquet`, `dim_nivel_diversificacao.parquet`, `dim_nivel_movimentacao.parquet`, `dim_classificacao.parquet` (tabelas de dimensão — de-para ID → descrição, ver `docs/dicionario_dados.md` seção 6)
+- `data/2_gold/dim_calendario.parquet` (dimensão de data, projetada a partir de `data/0_bronze/raw_Dim_Calendario.xlsx` — ver `docs/dicionario_dados.md` seção 6.5)
 
 Para rodar os testes: `pytest tests/ -q` (também a partir da raiz do projeto).
 

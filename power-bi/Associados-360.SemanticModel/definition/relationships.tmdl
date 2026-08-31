@@ -1,0 +1,5 @@
+relationship 023fcc9f-eeb3-4e3e-a3dc-627b107486f5
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Fato_Associados.DATA_ASSOCIACAO
+	toColumn: LocalDateTable_97de0c04-1a7d-4548-85f0-3697b30628a4.Date
+
