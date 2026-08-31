@@ -51,9 +51,7 @@ As regras sequenciais manuais descritas na primeira versão deste documento (top
 
 | Abordagem | Avaliação |
 |---|---|
-| Regras sequenciais manuais (exemplo do desafio) | Descartada: 83,1% dos associados caem na regra de fallback (ver acima) — pouco informativa para segmentar a base. |
-| Árvore de decisão (CART) supervisionada | Descartada: exige uma variável-alvo de classificação já rotulada para treinar o modelo, que é exatamente o que se está tentando definir — usar as próprias regras sequenciais como rótulo apenas herdaria o desbalanceamento acima; treinar sobre um rótulo arbitrário tornaria a árvore uma caixa-preta difícil de justificar ao negócio. |
-| Clustering (K-Means) não supervisionado | Descartada: não garante grupos de tamanho comparável nem uma ordem de negócio interpretável (os clusters não vêm rotulados "Inicial → Engajado"); é sensível à escala das variáveis e à inicialização aleatória, tornando o resultado menos determinístico entre execuções — contrário ao objetivo de reprodutibilidade do pipeline (ver `src/pipeline.py`, `run_pipeline`). |
+|
 | **Índice composto por percentil, com corte em quartis** *(adotada)* | Cada associado recebe uma pontuação de 0 a 1 combinando as quatro dimensões pedidas no desafio (Produtos, Relacionamento, Saldo, Utilização); a base inteira é então dividida em quartis dessa pontuação. Solução determinística entre execuções (sem aleatoriedade, sem variável-alvo a definir a priori), e por construção produz quatro grupos de tamanho comparável — resolvendo o desbalanceamento das regras sequenciais e sendo diretamente interpretável ao negócio. Avaliar com stakeholders, e verificar se alguma dimensão possui algum peso maior ou preferencial, isso produzirá estimativas e quebras de regra mais aderentes às estratégias da Cooperativa. |
 
 ### 5.2 Metodologia adotada — Índice de Classificação
