@@ -57,8 +57,8 @@ Levantado sobre `data/0_bronze/raw_associados.xlsx` (1000 registros por planilha
 | Campo | Problema | Regra de tratamento |
 |---|---|---|
 | CIDADE | Grafias múltiplas para a mesma cidade | Padronizar: `strip` + `title case` + normalização de acentuação, e aplicar dicionário de equivalência explícito (`"P. BRANCO"/"P. Branco"` → `"Pato Branco"`; `"Chapeco"` → `"Chapecó"`; `"Maringa"` → `"Maringá"`). Resultado: 5 categorias únicas. |
-| NOME | Espaços/caixa inconsistentes (a validar após import) | `strip` + capitalização padrão, sem alterar o conteúdo semântico |
-| RENDA_MENSAL | 12 nulos | **Decisão de negócio a confirmar com o time**: manter como nulo e excluir da média/indicadores agregados (default recomendado, evita viés de imputação) *ou* imputar pela mediana da cidade/agência do associado, sinalizando o registro com uma flag `RENDA_IMPUTADA`. Enquanto não confirmado, o pipeline deve preservar o nulo e reportar a métrica de nulos tratados. |
+| NOME | Espaços/caixa inconsistentes em potencial | `strip` + capitalização padrão (`standardize_text`), sem alterar o conteúdo semântico. Sem teste de regressão dedicado — dado sintético (10 valores para 1000 registros, seção 2) não usado como dimensão de análise. |
+| RENDA_MENSAL | 12 nulos | **Decisão adotada**: manter como nulo (sem imputação) e sinalizar com a categoria `FAIXA_RENDA = "Não informado"` na Gold, excluindo esses registros do denominador em análises percentuais de renda — evita viés de imputação sobre dado sintético. Ver `docs/regras_negocio.md` (seção 3). |
 | DATA_ASSOCIACAO | 37 datas futuras | Não editar o dado de origem silenciosamente: sinalizar os registros com `DATA_ASSOCIACAO_INVALIDA = True` e excluí-los do cálculo de `TEMPO_RELACIONAMENTO` (tratado como nulo), mantendo o registro no restante da análise. Justificar no relatório de qualidade a decisão adotada. |
 | CHAVE | Tipo | Garantir `int` em todas as bases antes do merge |
 | Colunas de produto | "S"/"N" | Converter para booleano (`S` → `True`, `N` → `False`) para uso em cálculos (`QTD_PRODUTOS`) |
@@ -73,6 +73,22 @@ Levantado sobre `data/0_bronze/raw_associados.xlsx` (1000 registros por planilha
 | Datas | Nenhuma `TEMPO_RELACIONAMENTO_ANOS` negativa na base final (registros inválidos tratados conforme regra acima) |
 | Domínio dos derivados | `QTD_PRODUTOS` ∈ [0,6]; `FAIXA_RENDA`, `NIVEL_MOVIMENTACAO`, `CLASSIFICACAO` sempre preenchidos com um valor do domínio definido em `regras_negocio.md` (sem categoria "Outro"/residual) |
 | Contagem de linhas | Base Gold com o mesmo número de associados da base Bronze (1000), salvo exclusão documentada e justificada |
+
+### 5.1 Resultado observado (pipeline implementado)
+
+Todas as regras acima são hoje impostas em tempo de execução — via `ValueError` nas funções de `src/cleaning/*.py` e `validate="one_to_one"` no `merge` de `src/features/consolidado.py` (nenhuma passa silenciosamente) — e confirmadas por `tests/test_silver.py` e `tests/test_features.py`. Resultado medido sobre a execução atual do pipeline (`data/1_silver/*.parquet`, `data/2_gold/features.parquet`):
+
+| Regra | Resultado observado |
+|---|---|
+| Unicidade de `CHAVE` | 1000 linhas, `CHAVE` única em Associados, Produtos, Movimentacao e na Gold consolidada |
+| Categorias de `CIDADE` | Exatamente as 5 categorias canônicas na Silver (`Cascavel`, `Chapecó`, `Maringá`, `Pato Branco`, `Toledo`) — as 7 variantes de origem (seção 2) foram reduzidas a 5, sem sobra |
+| Nulos residuais | `RENDA_MENSAL`: 12 nulos (únicos nulos herdados do Bronze). Na Gold, os nulos de `TEMPO_RELACIONAMENTO_DIAS`/`_ANOS` (37, um por `DATA_ASSOCIACAO_INVALIDA`) somam-se aos 12 de `RENDA_MENSAL` — todos os demais campos, incluindo os derivados, sem nulo |
+| `DATA_ASSOCIACAO_INVALIDA` | 37 registros sinalizados (mesmos 37 da avaliação Bronze, seção 2) |
+| `*_INVALIDO` (Movimentacao) | 0 registros sinalizados em `SALDO_MEDIO_INVALIDO`, `PIX_MENSAL_INVALIDO` e `COMPRAS_CARTAO_INVALIDO` — nenhum valor negativo na base real, regra preventiva sem ocorrência |
+| `QTD_PRODUTOS` | Intervalo observado 0–6, dentro do domínio esperado |
+| `FAIXA_RENDA = "Não informado"` | 12 registros (os mesmos de `RENDA_MENSAL` nula) |
+| `CLASSIFICACAO_TEMPO_INDISPONIVEL` | 37 registros (os mesmos de `DATA_ASSOCIACAO_INVALIDA`) |
+| Contagem de linhas | 1000 em cada Silver (Associados, Produtos, Movimentacao) e 1000 na Gold — nenhuma perda no `merge` pela `CHAVE` |
 
 ## 6. Métricas de qualidade a registrar no pipeline (log/relatório)
 
