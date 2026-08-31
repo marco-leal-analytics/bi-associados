@@ -11,7 +11,7 @@
         {
           "location": {
             "x": 121.20265066254498,
-            "y": 845.63056636176464
+            "y": 882.273228189976
           },
           "nodeIndex": "Dim_Classificação",
           "nodeLineageTag": "d48dc023-a484-4d71-9a13-55c62dc60335",
@@ -24,7 +24,7 @@
         {
           "location": {
             "x": 684.25061381584624,
-            "y": 854.086565245198
+            "y": 890.72922707340922
           },
           "nodeIndex": "Dim_Diversificação",
           "nodeLineageTag": "609b8200-e305-4976-b344-1b77ab2c6768",
@@ -37,7 +37,7 @@
         {
           "location": {
             "x": 949.92928290174063,
-            "y": 855.495898392437
+            "y": 892.13856022064829
           },
           "nodeIndex": "Dim_FaixaRenda",
           "nodeLineageTag": "1d818974-dc0b-4a45-8b45-7c7e6f9388a4",
@@ -50,7 +50,7 @@
         {
           "location": {
             "x": 415.10672435594239,
-            "y": 852.67723209795918
+            "y": 889.31989392617038
           },
           "nodeIndex": "Dim_Movimentação",
           "nodeLineageTag": "038c228b-8127-4ca2-91c8-da3984706da3",
@@ -63,7 +63,7 @@
         {
           "location": {
             "x": 511.84128066860751,
-            "y": 467.98530969933972
+            "y": 504.627971527551
           },
           "nodeIndex": "Fato_Associados",
           "nodeLineageTag": "8e908ef7-5298-4008-a374-b0a5f0515cc4",
@@ -76,7 +76,7 @@
         {
           "location": {
             "x": 203.74549393283314,
-            "y": 73.316001674849943
+            "y": 109.9586635030612
           },
           "nodeIndex": "Dim_Agências",
           "nodeLineageTag": "1e670daf-5170-41be-9d7d-ab132678f50e",
@@ -89,7 +89,7 @@
         {
           "location": {
             "x": 833.03211500636257,
-            "y": 73.285323656422563
+            "y": 109.92798548463382
           },
           "nodeIndex": "Dim_Calendario",
           "nodeLineageTag": "2dd67cc9-066a-41e9-b054-d422bf8f20eb",
@@ -98,6 +98,19 @@
             "width": 234
           },
           "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 1112.7266322391956,
+            "y": 439.74794919621849
+          },
+          "nodeIndex": "_Medidas",
+          "nodeLineageTag": "bb59ba53-3f78-4fd1-8b44-22a5455a6a52",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
         }
       ],
       "name": "Todas as tabelas",
