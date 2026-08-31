@@ -11,7 +11,7 @@ Construir um pipeline analítico completo (Bronze → Silver → Gold) para cons
 - **Pandas** — manipulação e transformação dos dados nas camadas Bronze, Silver e Gold.
 - **PyArrow / Parquet** — formato de armazenamento colunar das camadas Silver e Gold.
 - **Openpyxl** — leitura das planilhas Excel de origem (camada Bronze).
-- **Power BI** — dashboard final de visualização e análise de insights.
+- **Power BI** — dashboard final de visualização e análise de insights. Assim como uma versão do projeto .pbip. Todo o projeto e construção do dashboard foi versionado utilizando git.
 - **Git** — versionamento do código e documentação do projeto.
 
 ## Regras de Classificação e Score de Utilização de Produtos
@@ -59,7 +59,7 @@ Complementarmente, a Página 4 do Power BI usa uma abordagem exploratória sobre
    - Linux/Mac: `source .venv/bin/activate`
 
    O prompt do terminal passa a exibir `(.venv)` quando a ativação funciona.
-5. **Instalar as dependências** listadas em `requirements.txt` (`pandas`, `openpyxl`, `pyarrow`, `pytest`):
+5. **Instalar as dependências** listadas em `requirements.txt` (`pandas`, `openpyxl`, `pyarrow`):
    ```
    pip install -r requirements.txt
    ```
@@ -77,7 +77,7 @@ Complementarmente, a Página 4 do Power BI usa uma abordagem exploratória sobre
    - `data/2_gold/dim_faixa_renda.parquet`, `dim_tempo_relacionamento.parquet`, `dim_nivel_diversificacao.parquet`, `dim_nivel_movimentacao.parquet`, `dim_classificacao.parquet`, `dim_calendario.parquet`, `dim_agencia.parquet` — tabelas de dimensão para o modelo em estrela.
 10. **Rodar os testes automatizados** (valida qualidade, integridade referencial e regras de negócio sobre os dados gerados):
     ```
-    pytest tests/ -q
+    
     ```
 11. **Abrir o dashboard**: com `data/2_gold/features_dashboard.parquet` e as dimensões `dim_*.parquet` gerados, abra o Power BI e importe/atualize essas tabelas (relacionadas por ID/data/agência conforme `docs/dicionario_dados.md`, seção 6).
 12. **Reexecutar após mudanças**: qualquer alteração nos dados brutos (`data/0_bronze/`) ou no código em `src/` exige rodar novamente o passo 7 para atualizar Silver e Gold — o pipeline sempre reprocessa do zero, não é incremental.
@@ -118,7 +118,7 @@ Legenda: **Concluído** | **Parcial** (existe, mas incompleto/divergente) | **Pe
 |---|---|---|
 | 02.01 Inicializar Git | **Concluído** | Repositório Git inicializado (`Initial commit`, `chore(estrutura): inicializar estrutura do projeto`). |
 | 02.02 Configurar .gitignore | **Parcial** | `.gitignore` ignora `.venv`, `__pycache__`, caches de teste, `.ipynb_checkpoints` e `.env`; ainda não há regras para artefatos locais do Power BI (workspace `powerbi/` ainda não existe). |
-| 02.03 Configurar dependências | **Concluído** | `requirements.txt` com `pandas`, `openpyxl`, `pyarrow` e `pytest` — cobre leitura Excel, Parquet e testes. |
+| 02.03 Configurar dependências | **Concluído** | `requirements.txt` com `pandas`, `openpyxl`, `pyarrow`  — cobre leitura Excel, Parquet e testes. |
 | 02.04 Criar baseline | **Concluído** | Estrutura inicial registrada nos commits iniciais antes da implementação funcional. |
 
 ### 03 — Estruturação da Arquitetura
@@ -249,6 +249,6 @@ O comando acima gera/atualiza, em ordem:
 - `data/2_gold/dim_calendario.parquet` (dimensão de data, projetada a partir de `data/0_bronze/raw_Dim_Calendario.xlsx` — ver `docs/dicionario_dados.md` seção 6.6)
 - `data/2_gold/dim_agencia.parquet` (código AGENCIA → nome de agência, levantamento de negócio — ver `docs/dicionario_dados.md` seção 6.7)
 
-Para rodar os testes: `pytest tests/ -q` (também a partir da raiz do projeto).
+
 
 
