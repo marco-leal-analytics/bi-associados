@@ -1,0 +1,33 @@
+table Dim_Agências
+	lineageTag: 1e670daf-5170-41be-9d7d-ab132678f50e
+
+	column AGENCIA
+		dataType: int64
+		formatString: 0
+		lineageTag: c959a2df-927c-4a79-be1e-e7e9ec96f7e1
+		summarizeBy: none
+		sourceColumn: AGENCIA
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME_AGENCIA
+		dataType: string
+		lineageTag: 21766b64-4703-425c-b421-1c0fafd1d411
+		summarizeBy: none
+		sourceColumn: NOME_AGENCIA
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Agências = m
+		mode: import
+		queryGroup: Dimensões
+		source =
+				let
+				    Fonte = Parquet.Document(File.Contents("C:\Users\Leal\Documents\portfolio\bi-associados\data\2_gold\dim_agencia.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Fonte
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

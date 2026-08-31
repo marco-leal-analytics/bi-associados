@@ -14,7 +14,7 @@ table Fato_Associados
 		dataType: int64
 		formatString: 0
 		lineageTag: fed2fb40-a1fb-41ad-9344-1f6d270b28c1
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: AGENCIA
 
 		annotation SummarizationSetBy = Automatic
@@ -41,7 +41,7 @@ table Fato_Associados
 		dataType: int64
 		formatString: 0
 		lineageTag: f1119a85-e107-4a36-bb71-099ecfa1d7e3
-		summarizeBy: count
+		summarizeBy: none
 		sourceColumn: FAIXA_RENDA_ID
 
 		annotation SummarizationSetBy = Automatic
@@ -72,11 +72,6 @@ table Fato_Associados
 		summarizeBy: none
 		sourceColumn: DATA_ASSOCIACAO
 
-		variation Variation
-			isDefault
-			relationship: 023fcc9f-eeb3-4e3e-a3dc-627b107486f5
-			defaultHierarchy: LocalDateTable_97de0c04-1a7d-4548-85f0-3697b30628a4.'Hierarquia de datas'
-
 		annotation SummarizationSetBy = Automatic
 
 	column TEMPO_RELACIONAMENTO_ANOS
@@ -102,7 +97,7 @@ table Fato_Associados
 		dataType: int64
 		formatString: 0
 		lineageTag: 42e7ebaa-80ba-4da9-86bd-5633b8ad6f6f
-		summarizeBy: count
+		summarizeBy: none
 		sourceColumn: CLASSIFICACAO_ID
 
 		annotation SummarizationSetBy = Automatic

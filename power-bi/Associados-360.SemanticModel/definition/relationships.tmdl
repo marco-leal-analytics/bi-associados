@@ -1,5 +1,21 @@
-relationship 023fcc9f-eeb3-4e3e-a3dc-627b107486f5
+relationship 767148de-ee9f-4fb0-928d-9dcbfd0b4855
 	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Calendario.DATA
+	toColumn: LocalDateTable_7d9f2504-334b-49e6-a08c-f95dc96e3be9.Date
+
+relationship AutoDetected_7d114429-f6df-41e9-8670-4037d156e118
+	fromColumn: Fato_Associados.AGENCIA
+	toColumn: Dim_Agências.AGENCIA
+
+relationship b93348ff-6790-bc56-fb70-a0bbdebefa66
 	fromColumn: Fato_Associados.DATA_ASSOCIACAO
-	toColumn: LocalDateTable_97de0c04-1a7d-4548-85f0-3697b30628a4.Date
+	toColumn: Dim_Calendario.DATA
+
+relationship 744c51f0-f5ca-c637-4052-487608b50db9
+	fromColumn: Fato_Associados.CLASSIFICACAO_ID
+	toColumn: Dim_Classificação.ID
+
+relationship c6132923-3684-d056-d589-a989a04200c2
+	fromColumn: Fato_Associados.FAIXA_RENDA_ID
+	toColumn: Dim_FaixaRenda.ID
 

@@ -19,15 +19,17 @@ annotation __PBI_TimeIntelligenceEnabled = 1
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["Fato_Associados","Dim_Classificação","Dim_FaixaRenda","Dim_Diversificação","Dim_Movimentação"]
+annotation PBI_QueryOrder = ["Fato_Associados","Dim_Classificação","Dim_FaixaRenda","Dim_Diversificação","Dim_Movimentação","Dim_Agências","Dim_Calendario"]
 
 ref table Fato_Associados
 ref table DateTableTemplate_87e63542-2c62-473a-86a9-eb38672fd20b
-ref table LocalDateTable_97de0c04-1a7d-4548-85f0-3697b30628a4
 ref table Dim_Classificação
 ref table Dim_FaixaRenda
 ref table Dim_Diversificação
 ref table Dim_Movimentação
+ref table Dim_Agências
+ref table Dim_Calendario
+ref table LocalDateTable_7d9f2504-334b-49e6-a08c-f95dc96e3be9
 
 ref cultureInfo pt-BR
 

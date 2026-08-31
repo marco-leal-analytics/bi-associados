@@ -5,7 +5,7 @@ table Dim_FaixaRenda
 		dataType: int64
 		formatString: 0
 		lineageTag: 1498bd62-965b-493c-ba3f-a1b150f1dd59
-		summarizeBy: count
+		summarizeBy: none
 		sourceColumn: ID
 
 		annotation SummarizationSetBy = Automatic

@@ -37,6 +37,22 @@
           "type": "BaseTheme"
         }
       ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "Slide111485341716521169.PNG",
+          "path": "Slide111485341716521169.PNG",
+          "type": "Image"
+        },
+        {
+          "name": "Slide24527801977983934.PNG",
+          "path": "Slide24527801977983934.PNG",
+          "type": "Image"
+        }
+      ]
     }
   ],
   "settings": {

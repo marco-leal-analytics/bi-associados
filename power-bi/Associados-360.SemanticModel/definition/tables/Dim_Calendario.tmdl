@@ -1,0 +1,106 @@
+table Dim_Calendario
+	lineageTag: 2dd67cc9-066a-41e9-b054-d422bf8f20eb
+
+	column DATA
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fc280555-05c8-459d-abcb-96c7699ccd90
+		summarizeBy: none
+		sourceColumn: DATA
+
+		variation Variation
+			isDefault
+			relationship: 767148de-ee9f-4fb0-928d-9dcbfd0b4855
+			defaultHierarchy: LocalDateTable_7d9f2504-334b-49e6-a08c-f95dc96e3be9.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANO
+		dataType: int64
+		formatString: 0
+		lineageTag: 01092282-e541-48a0-9d79-76fcfbadd284
+		summarizeBy: sum
+		sourceColumn: ANO
+
+		annotation SummarizationSetBy = Automatic
+
+	column MES
+		dataType: int64
+		formatString: 0
+		lineageTag: 6e9cef05-4686-4675-91d5-784580214057
+		summarizeBy: sum
+		sourceColumn: MES
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME_MES
+		dataType: string
+		lineageTag: 504ae901-74c7-4bc7-9acc-200e0db45c93
+		summarizeBy: none
+		sourceColumn: NOME_MES
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME_MES_ABREVIADO
+		dataType: string
+		lineageTag: 27a48b90-f542-49a2-8ac5-fe93c04203fc
+		summarizeBy: none
+		sourceColumn: NOME_MES_ABREVIADO
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANO_MES
+		dataType: string
+		lineageTag: b4752b39-aab1-49c9-805e-b7a7fbe246f2
+		summarizeBy: none
+		sourceColumn: ANO_MES
+
+		annotation SummarizationSetBy = Automatic
+
+	column TRIMESTRE
+		dataType: int64
+		formatString: 0
+		lineageTag: 97c7f752-77df-475e-96b7-76ffcd2858e7
+		summarizeBy: sum
+		sourceColumn: TRIMESTRE
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME_TRIMESTRE
+		dataType: string
+		lineageTag: d7679af2-37e8-452b-95e6-38901f15bb06
+		summarizeBy: none
+		sourceColumn: NOME_TRIMESTRE
+
+		annotation SummarizationSetBy = Automatic
+
+	column SEMESTRE
+		dataType: int64
+		formatString: 0
+		lineageTag: 94acf68e-af41-4abc-b83a-7d9a3bf67234
+		summarizeBy: sum
+		sourceColumn: SEMESTRE
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME_SEMESTRE
+		dataType: string
+		lineageTag: 32f39a6e-baa0-4667-bfff-f54dffb8268b
+		summarizeBy: none
+		sourceColumn: NOME_SEMESTRE
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Calendario = m
+		mode: import
+		queryGroup: Dimensões
+		source =
+				let
+				    Fonte = Parquet.Document(File.Contents("C:\Users\Leal\Documents\portfolio\bi-associados\data\2_gold\dim_calendario.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Fonte
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

@@ -10,8 +10,8 @@
       "nodes": [
         {
           "location": {
-            "x": 0,
-            "y": 86
+            "x": 121.20265066254498,
+            "y": 845.63056636176464
           },
           "nodeIndex": "Dim_Classificação",
           "nodeLineageTag": "d48dc023-a484-4d71-9a13-55c62dc60335",
@@ -19,12 +19,12 @@
             "height": 128,
             "width": 234
           },
-          "zIndex": 0
+          "zIndex": 4
         },
         {
           "location": {
-            "x": 284,
-            "y": 86
+            "x": 684.25061381584624,
+            "y": 854.086565245198
           },
           "nodeIndex": "Dim_Diversificação",
           "nodeLineageTag": "609b8200-e305-4976-b344-1b77ab2c6768",
@@ -32,12 +32,12 @@
             "height": 128,
             "width": 234
           },
-          "zIndex": 0
+          "zIndex": 6
         },
         {
           "location": {
-            "x": 568,
-            "y": 86
+            "x": 949.92928290174063,
+            "y": 855.495898392437
           },
           "nodeIndex": "Dim_FaixaRenda",
           "nodeLineageTag": "1d818974-dc0b-4a45-8b45-7c7e6f9388a4",
@@ -45,12 +45,12 @@
             "height": 128,
             "width": 234
           },
-          "zIndex": 0
+          "zIndex": 7
         },
         {
           "location": {
-            "x": 852,
-            "y": 86
+            "x": 415.10672435594239,
+            "y": 852.67723209795918
           },
           "nodeIndex": "Dim_Movimentação",
           "nodeLineageTag": "038c228b-8127-4ca2-91c8-da3984706da3",
@@ -58,12 +58,12 @@
             "height": 128,
             "width": 234
           },
-          "zIndex": 0
+          "zIndex": 5
         },
         {
           "location": {
-            "x": 1136,
-            "y": 0
+            "x": 511.84128066860751,
+            "y": 467.98530969933972
           },
           "nodeIndex": "Fato_Associados",
           "nodeLineageTag": "8e908ef7-5298-4008-a374-b0a5f0515cc4",
@@ -71,11 +71,37 @@
             "height": 300,
             "width": 234
           },
-          "zIndex": 0
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 203.74549393283314,
+            "y": 73.316001674849943
+          },
+          "nodeIndex": "Dim_Agências",
+          "nodeLineageTag": "1e670daf-5170-41be-9d7d-ab132678f50e",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 833.03211500636257,
+            "y": 73.285323656422563
+          },
+          "nodeIndex": "Dim_Calendario",
+          "nodeLineageTag": "2dd67cc9-066a-41e9-b054-d422bf8f20eb",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 3
         }
       ],
       "name": "Todas as tabelas",
-      "zoomValue": 100,
+      "zoomValue": 70.95554390096882,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,
