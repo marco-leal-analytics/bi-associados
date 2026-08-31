@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "db299e3370a04c45aff7",
   "position": {
-    "x": 751.82527301092045,
-    "y": 780.28081123244931,
+    "x": 384.89859594383773,
+    "y": 591.575663026521,
     "z": 0,
-    "height": 239.62558502340093,
-    "width": 1168.1747269890795,
+    "height": 428.33073322932916,
+    "width": 1535.1014040561622,
     "tabOrder": 4
   },
   "visual": {
@@ -130,6 +130,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'15'"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Total de Associados por Ano'"
                 }
               }
             }

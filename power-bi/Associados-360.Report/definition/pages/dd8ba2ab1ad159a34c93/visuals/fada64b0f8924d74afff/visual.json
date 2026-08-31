@@ -27,8 +27,9 @@
                 }
               },
               "queryRef": "Fato_Associados.QTD_PRODUTOS",
-              "nativeQueryRef": "QTD_PRODUTOS",
-              "active": true
+              "nativeQueryRef": "Qtd. Produtos",
+              "active": true,
+              "displayName": "Qtd. Produtos"
             }
           ]
         },

@@ -129,7 +129,7 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 
 ### 5.6 Tabela reduzida para o Power BI (`features_dashboard.parquet`)
 
-`data/2_gold/features_dashboard.parquet`: projeção de `features.parquet` (seção 5) só com as colunas que alimentam algum visual das 4 páginas do dashboard (`regras_negocio.md`, seção 7), gerada por `build_dashboard_features` (`src/features/consolidado.py`) a partir de `DASHBOARD_COLUMNS` (`src/config/settings.py`) e persistida por `run_gold` (`src/pipeline.py`). 1000 linhas × 16 colunas, contra 41 colunas da fato completa — os campos deixados de fora são todos intermediários de cálculo (pilares `SCORE_*`, níveis individuais de movimentação, `INDICE_*`, colunas de produto por tipo, flags `*_INVALIDO` de qualidade) que já foram consumidos para produzir `CLASSIFICACAO_ID`/`FLAG_OPORTUNIDADE_*` e não têm visual próprio no desafio. Esta é a tabela recomendada para o import no Power BI (junto das cinco dimensões `dim_*_id`, da `dim_calendario` e da `dim_agencia`, seção 6); `features.parquet` continua disponível como fato completa/auditável.
+`data/2_gold/features_dashboard.parquet`: projeção de `features.parquet` (seção 5) só com as colunas que alimentam algum visual das 4 páginas do dashboard (`regras_negocio.md`, seção 7), gerada por `build_dashboard_features` (`src/features/consolidado.py`) a partir de `DASHBOARD_COLUMNS` (`src/config/settings.py`) e persistida por `run_gold` (`src/pipeline.py`). 1000 linhas × 22 colunas, contra 41 colunas da fato completa — os campos deixados de fora são intermediários de cálculo sem visual próprio (níveis individuais de movimentação, colunas de produto por tipo, flags `*_INVALIDO` de qualidade). `INDICE_CLASSIFICACAO` e os cinco pilares `SCORE_*` são exceção incluída propositalmente para a Página 4: a matriz Renda × Classificação usa `INDICE_CLASSIFICACAO` (rotulado no Power BI como "Score de Utilização de Produtos") como valor — quanto menor o score, maior a oportunidade — e a tabela detalhada de associados traz os `SCORE_*` individuais como informação auxiliar de composição, ordenada de forma ascendente pelo mesmo índice. Esta é a tabela recomendada para o import no Power BI (junto das cinco dimensões `dim_*_id`, da `dim_calendario` e da `dim_agencia`, seção 6); `features.parquet` continua disponível como fato completa/auditável.
 
 | Coluna | Página que usa | Papel |
 |---|---|---|
@@ -145,6 +145,12 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 | TEMPO_RELACIONAMENTO_FAIXA_ID | Página 2 | FK para `dim_tempo_relacionamento` |
 | DATA_ASSOCIACAO_INVALIDA | Todas (nota de rodapé) | Sinaliza os 37 registros excluídos do cálculo de tempo — ver `insights.md` |
 | CLASSIFICACAO_ID | Página 3 | FK para `dim_classificacao` |
+| INDICE_CLASSIFICACAO | Página 4 | Valor da matriz Renda × Classificação; ranking (ordenação ascendente) da tabela de associados |
+| SCORE_PRODUTOS | Página 4 | Pilar "Produtos" do índice — informação auxiliar de composição na tabela detalhada |
+| SCORE_RELACIONAMENTO | Página 4 | Pilar "Relacionamento" do índice — informação auxiliar de composição |
+| SCORE_SALDO | Página 4 | Pilar "Saldo" do índice — informação auxiliar de composição |
+| SCORE_PIX_MENSAL | Página 4 | Pilar "Pix Mensal" do índice — informação auxiliar de composição |
+| SCORE_COMPRAS_CARTAO | Página 4 | Pilar "Compras no Cartão" do índice — informação auxiliar de composição |
 | CLASSIFICACAO_TEMPO_INDISPONIVEL | Página 3 (transparência) | Sinaliza score de relacionamento neutralizado |
 | FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS | Página 4 | Lista de oportunidade |
 | FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO | Página 4 | Lista de oportunidade |

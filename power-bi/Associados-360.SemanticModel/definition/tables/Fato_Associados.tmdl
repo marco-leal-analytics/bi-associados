@@ -147,6 +147,66 @@ table Fato_Associados
 
 		annotation SummarizationSetBy = Automatic
 
+	column INDICE_CLASSIFICACAO
+		dataType: double
+		lineageTag: b1c4d7e2-5f8a-4d3b-9c6e-2a7f5b8d1e40
+		summarizeBy: sum
+		sourceColumn: INDICE_CLASSIFICACAO
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SCORE_PRODUTOS
+		dataType: double
+		lineageTag: c2d5e8f3-6a9b-4e4c-8d7f-3b8a6c9e2f51
+		summarizeBy: sum
+		sourceColumn: SCORE_PRODUTOS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SCORE_RELACIONAMENTO
+		dataType: double
+		lineageTag: e4165bd9-09a1-4f92-922b-710bf088d403
+		summarizeBy: sum
+		sourceColumn: SCORE_RELACIONAMENTO
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SCORE_SALDO
+		dataType: double
+		lineageTag: 766383cf-7a9a-4286-9880-50a36c0c05b5
+		summarizeBy: sum
+		sourceColumn: SCORE_SALDO
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SCORE_PIX_MENSAL
+		dataType: double
+		lineageTag: d198a57f-4523-44c4-9e6d-e1d3dc272112
+		summarizeBy: sum
+		sourceColumn: SCORE_PIX_MENSAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SCORE_COMPRAS_CARTAO
+		dataType: double
+		lineageTag: 42fe0b04-f33c-4e32-a4cd-d0d92effc6e2
+		summarizeBy: sum
+		sourceColumn: SCORE_COMPRAS_CARTAO
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition Fato_Associados = m
 		mode: import
 		queryGroup: Fatos

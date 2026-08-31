@@ -1,0 +1,457 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "aa4bc3ccf7baa389c8f8",
+  "position": {
+    "x": 356.44305772230888,
+    "y": 368.42433697347894,
+    "z": 1,
+    "height": 693.41653666146647,
+    "width": 1563.5569422776912,
+    "tabOrder": 7
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fato_Associados"
+                    }
+                  },
+                  "Property": "CHAVE"
+                }
+              },
+              "queryRef": "Fato_Associados.CHAVE",
+              "nativeQueryRef": "CHAVE",
+              "displayName": "CHAVE"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Total de Associados"
+                }
+              },
+              "queryRef": "_Medidas.Total de Associados",
+              "nativeQueryRef": "Total de Associados"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tempo Médio de Relacionamento (Anos)"
+                }
+              },
+              "queryRef": "_Medidas.Tempo Médio de Relacionamento (Anos)",
+              "nativeQueryRef": "Tempo Médio de Relacionamento (Anos)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Saldo Médio"
+                }
+              },
+              "queryRef": "_Medidas.Saldo Médio",
+              "nativeQueryRef": "Saldo Médio"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Renda Média"
+                }
+              },
+              "queryRef": "_Medidas.Renda Média",
+              "nativeQueryRef": "Renda Média"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Produtos por Associado"
+                }
+              },
+              "queryRef": "_Medidas.Produtos por Associado",
+              "nativeQueryRef": "Produtos por Associado"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fato_Associados"
+                        }
+                      },
+                      "Property": "SCORE_SALDO"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fato_Associados.SCORE_SALDO)",
+              "nativeQueryRef": "Score Saldo Médio",
+              "displayName": "Score Saldo Médio"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fato_Associados"
+                        }
+                      },
+                      "Property": "SCORE_RELACIONAMENTO"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fato_Associados.SCORE_RELACIONAMENTO)",
+              "nativeQueryRef": "Score Relacionamento",
+              "displayName": "Score Relacionamento"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fato_Associados"
+                        }
+                      },
+                      "Property": "SCORE_PRODUTOS"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fato_Associados.SCORE_PRODUTOS)",
+              "nativeQueryRef": "Score Produtos",
+              "displayName": "Score Produtos"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fato_Associados"
+                        }
+                      },
+                      "Property": "SCORE_PIX_MENSAL"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fato_Associados.SCORE_PIX_MENSAL)",
+              "nativeQueryRef": "Score Pix Mensal",
+              "displayName": "Score Pix Mensal"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fato_Associados"
+                        }
+                      },
+                      "Property": "SCORE_COMPRAS_CARTAO"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fato_Associados.SCORE_COMPRAS_CARTAO)",
+              "nativeQueryRef": "Score Compra Cartão",
+              "displayName": "Score Compra Cartão"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fato_Associados"
+                        }
+                      },
+                      "Property": "INDICE_CLASSIFICACAO"
+                    }
+                  },
+                  "Function": 1
+                }
+              },
+              "queryRef": "Avg(Fato_Associados.INDICE_CLASSIFICACAO)",
+              "nativeQueryRef": "Score Utilização Produtos",
+              "displayName": "Score Utilização Produtos"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Classificação"
+                    }
+                  },
+                  "Property": "DESCRICAO"
+                }
+              },
+              "queryRef": "Dim_Classificação.DESCRICAO",
+              "nativeQueryRef": "Classifição Utilização",
+              "displayName": "Classifição Utilização"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Aggregation": {
+                "Expression": {
+                  "Column": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "Fato_Associados"
+                      }
+                    },
+                    "Property": "INDICE_CLASSIFICACAO"
+                  }
+                },
+                "Function": 1
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "162.00001747189282D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Medidas.Tempo Médio de Relacionamento (Anos)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "109.25000941602308D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Medidas.Produtos por Associado"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "98.24999309149148D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(Fato_Associados.SCORE_SALDO)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "124.25000489724547D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(Fato_Associados.SCORE_RELACIONAMENTO)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "92.2499974225015D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(Fato_Associados.SCORE_PRODUTOS)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "89.50001219451947D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(Fato_Associados.SCORE_PIX_MENSAL)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "108.50003865219543D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(Fato_Associados.SCORE_COMPRAS_CARTAO)"
+          }
+        },
+        {
+          "properties": {},
+          "selector": {
+            "metadata": "Dim_Classificação.DESCRICAO"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "115.66675304777556D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Avg(Fato_Associados.INDICE_CLASSIFICACAO)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "93.33335028753724D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Medidas.Total de Associados"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Center'"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Lista de Associados e Utilização de Produtos'"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI'', wf_segoe-ui_normal, helvetica, arial, sans-serif'"
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "20D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

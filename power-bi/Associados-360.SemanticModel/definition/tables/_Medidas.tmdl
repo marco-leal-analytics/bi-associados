@@ -31,6 +31,21 @@ table _Medidas
 		displayFolder: #Contagens
 		lineageTag: 9a1e5c7f-3d2b-4c6a-8e4f-1b7c9d3a5f60
 
+	measure 'Oportunidades - Alta Renda Poucos Produtos' = CALCULATE([Total de Associados], Fato_Associados[FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS] = TRUE)
+		formatString: 0
+		displayFolder: Oportunidades
+		lineageTag: d4e7f0a3-8b1c-4d5e-9f2a-6b3c8e1f4a72
+
+	measure 'Oportunidades - Baixa Utilização' = CALCULATE([Total de Associados], Fato_Associados[FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO] = TRUE)
+		formatString: 0
+		displayFolder: Oportunidades
+		lineageTag: e5f8a1b4-9c2d-4e6f-a03b-7c4d9f2a5b83
+
+	measure 'Oportunidades - Potencial de Crescimento' = CALCULATE([Total de Associados], Fato_Associados[FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO] = TRUE)
+		formatString: 0
+		displayFolder: Oportunidades
+		lineageTag: f6a9b2c5-ad3e-4f70-b14c-8d5eaf3b6c94
+
 	partition _Medidas = m
 		mode: import
 		source =

@@ -220,6 +220,16 @@ cultureInfo pt-BR
 			            },
 			            "Weight": 0.9
 			          }
+			        },
+			        {
+			          "Qtd. Produtos": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
 			        }
 			      ]
 			    },
@@ -699,6 +709,16 @@ cultureInfo pt-BR
 			        },
 			        {
 			          "Faixa de Classificação": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "Classifição Utilização": {
 			            "State": "Suggested",
 			            "Source": {
 			              "Type": "External",
@@ -2107,6 +2127,217 @@ cultureInfo pt-BR
 			          }
 			        }
 			      ]
+			    },
+			    "fato_associado.indice_classificacao": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Fato_Associados",
+			          "ConceptualProperty": "INDICE_CLASSIFICACAO"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "indice classificacao": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "INDICE_CLASSIFICACAO": {
+			            "Type": "Noun",
+			            "State": "Generated",
+			            "Weight": 0.99
+			          }
+			        }
+			      ]
+			    },
+			    "fato_associado.score_produto": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Fato_Associados",
+			          "ConceptualProperty": "SCORE_PRODUTOS"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "score produto": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "SCORE_PRODUTOS": {
+			            "Type": "Noun",
+			            "State": "Generated",
+			            "Weight": 0.99
+			          }
+			        }
+			      ]
+			    },
+			    "fato_associado.score_relacionamento": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Fato_Associados",
+			          "ConceptualProperty": "SCORE_RELACIONAMENTO"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "score relacionamento": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "SCORE_RELACIONAMENTO": {
+			            "Type": "Noun",
+			            "State": "Generated",
+			            "Weight": 0.99
+			          }
+			        }
+			      ]
+			    },
+			    "fato_associado.score_saldo": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Fato_Associados",
+			          "ConceptualProperty": "SCORE_SALDO"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "score saldo": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "SCORE_SALDO": {
+			            "Type": "Noun",
+			            "State": "Generated",
+			            "Weight": 0.99
+			          }
+			        }
+			      ]
+			    },
+			    "fato_associado.score_pix_mensal": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Fato_Associados",
+			          "ConceptualProperty": "SCORE_PIX_MENSAL"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "score pix mensal": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "SCORE_PIX_MENSAL": {
+			            "Type": "Noun",
+			            "State": "Generated",
+			            "Weight": 0.99
+			          }
+			        }
+			      ]
+			    },
+			    "fato_associado.score_compras_cartao": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Fato_Associados",
+			          "ConceptualProperty": "SCORE_COMPRAS_CARTAO"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "score compras cartao": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "score compra cartao": {
+			            "Type": "Noun",
+			            "State": "Generated",
+			            "Weight": 0.78
+			          }
+			        },
+			        {
+			          "SCORE_COMPRAS_CARTAO": {
+			            "Type": "Noun",
+			            "State": "Generated",
+			            "Weight": 0.99
+			          }
+			        }
+			      ]
+			    },
+			    "entity__medida.oportunidades__alta_renda_poucos_produtos": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Oportunidades - Alta Renda Poucos Produtos"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "oportunidades - alta renda poucos produtos": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "oportunidades alta renda poucos produtos": {
+			            "State": "Generated",
+			            "Weight": 0.97
+			          }
+			        }
+			      ]
+			    },
+			    "entity__medida.oportunidades__baixa_utilização": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Oportunidades - Baixa Utilização"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "oportunidades - baixa utilização": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "oportunidades baixa utilização": {
+			            "State": "Generated",
+			            "Weight": 0.97
+			          }
+			        }
+			      ]
+			    },
+			    "entity__medida.oportunidades__potencial_de_crescimento": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Oportunidades - Potencial de Crescimento"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "oportunidades - potencial de crescimento": {
+			            "State": "Generated"
+			          }
+			        },
+			        {
+			          "oportunidades potencial de crescimento": {
+			            "State": "Generated",
+			            "Weight": 0.97
+			          }
+			        }
+			      ]
 			    }
 			  },
 			  "Relationships": {
@@ -2436,6 +2667,303 @@ cultureInfo pt-BR
 			          "State": "Generated",
 			          "Weight": 0.99,
 			          "ID": "dim_agências_have_fato_associados"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_entity__medida_oportunidades__potencial_de_crescimento": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "entity__medida.oportunidades__potencial_de_crescimento": {
+			          "Target": {
+			            "Entity": "entity__medida.oportunidades__potencial_de_crescimento"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "entity__medida.oportunidades__potencial_de_crescimento"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_oportunidades__potencial_de_crescimento"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_entity__medida_oportunidades__baixa_utilização": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "entity__medida.oportunidades__baixa_utilização": {
+			          "Target": {
+			            "Entity": "entity__medida.oportunidades__baixa_utilização"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "entity__medida.oportunidades__baixa_utilização"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_oportunidades__baixa_utilização"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_entity__medida_oportunidades__alta_renda_poucos_produtos": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "entity__medida.oportunidades__alta_renda_poucos_produtos": {
+			          "Target": {
+			            "Entity": "entity__medida.oportunidades__alta_renda_poucos_produtos"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "entity__medida.oportunidades__alta_renda_poucos_produtos"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_oportunidades__alta_renda_poucos_produtos"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_score_compras_cartao": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "fato_associado.score_compras_cartao": {
+			          "Target": {
+			            "Entity": "fato_associado.score_compras_cartao"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "fato_associado.score_compras_cartao"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_score_compras_cartaos"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_score_pix_mensal": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "fato_associado.score_pix_mensal": {
+			          "Target": {
+			            "Entity": "fato_associado.score_pix_mensal"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "fato_associado.score_pix_mensal"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_score_pix_mensal"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_score_saldo": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "fato_associado.score_saldo": {
+			          "Target": {
+			            "Entity": "fato_associado.score_saldo"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "fato_associado.score_saldo"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_score_saldos"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_score_relacionamento": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "fato_associado.score_relacionamento": {
+			          "Target": {
+			            "Entity": "fato_associado.score_relacionamento"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "fato_associado.score_relacionamento"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_score_relacionamentos"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_score_produto": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "fato_associado.score_produto": {
+			          "Target": {
+			            "Entity": "fato_associado.score_produto"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "fato_associado.score_produto"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_score_produtos"
+			        }
+			      ]
+			    },
+			    "fato_associado_has_indice_classificacao": {
+			      "Binding": {
+			        "ConceptualEntity": "Fato_Associados"
+			      },
+			      "State": "Generated",
+			      "Roles": {
+			        "fato_associado": {
+			          "Target": {
+			            "Entity": "fato_associado"
+			          }
+			        },
+			        "fato_associado.indice_classificacao": {
+			          "Target": {
+			            "Entity": "fato_associado.indice_classificacao"
+			          }
+			        }
+			      },
+			      "Phrasings": [
+			        {
+			          "Attribute": {
+			            "Subject": {
+			              "Role": "fato_associado"
+			            },
+			            "Object": {
+			              "Role": "fato_associado.indice_classificacao"
+			            }
+			          },
+			          "State": "Generated",
+			          "Weight": 0.99,
+			          "ID": "fato_associados_have_indice_classificacaos"
 			        }
 			      ]
 			    },

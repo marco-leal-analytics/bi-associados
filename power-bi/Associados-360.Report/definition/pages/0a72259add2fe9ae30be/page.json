@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "0a72259add2fe9ae30be",
-  "displayName": "Página 4",
+  "displayName": "Oportunidade de Negócios",
   "displayOption": "FitToPage",
   "height": 1080,
   "width": 1920,

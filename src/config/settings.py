@@ -231,10 +231,13 @@ DASHBOARD_COLUMNS = (
     "TEMPO_RELACIONAMENTO_FAIXA_ID",  # Página 2 — FK para dim_tempo_relacionamento
     "DATA_ASSOCIACAO_INVALIDA",  # Nota de rodapé: exclusões de tempo de relacionamento (docs/insights.md)
     "CLASSIFICACAO_ID",  # Página 3 — FK para dim_classificacao
+    "INDICE_CLASSIFICACAO",  # Página 4 — ranking dos associados dentro de cada lista de oportunidade
+    "SCORE_PRODUTOS",  # Página 4 — score de composição/diversificação de produtos (pilar "Produtos" do índice)
+    "SCORE_RELACIONAMENTO",  # Página 4 — score de relacionamento
+    "SCORE_SALDO",  # Página 4 — score de saldo
+    "SCORE_PIX_MENSAL",  # Página 4 — score de transações PIX mensais
+    "SCORE_COMPRAS_CARTAO",  # Página 4 — score de compras com cartão
     "CLASSIFICACAO_TEMPO_INDISPONIVEL",  # Transparência: score de relacionamento neutralizado
-    "FLAG_OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS",  # Página 4
-    "FLAG_OPORTUNIDADE_BAIXA_UTILIZACAO",  # Página 4
-    "FLAG_OPORTUNIDADE_POTENCIAL_CRESCIMENTO",  # Página 4
 )
 
 # --- Dimensão Calendário (fonte externa, data/0_bronze/raw_Dim_Calendario.xlsx) ---

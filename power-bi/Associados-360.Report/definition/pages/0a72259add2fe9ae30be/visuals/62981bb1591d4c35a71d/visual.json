@@ -1,0 +1,270 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "62981bb1591d4c35a71d",
+  "position": {
+    "x": 867.14508580343215,
+    "y": 16.474258970358814,
+    "z": 0,
+    "height": 339.96879875195009,
+    "width": 585.585023400936,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Classificação"
+                    }
+                  },
+                  "Property": "DESCRICAO"
+                }
+              },
+              "queryRef": "Dim_Classificação.DESCRICAO",
+              "nativeQueryRef": "DESCRICAO",
+              "active": true
+            }
+          ]
+        },
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_FaixaRenda"
+                    }
+                  },
+                  "Property": "DESCRICAO"
+                }
+              },
+              "queryRef": "Dim_FaixaRenda.DESCRICAO",
+              "nativeQueryRef": "Faixa de Renda",
+              "active": true,
+              "displayName": "Faixa de Renda"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fato_Associados"
+                    }
+                  },
+                  "Property": "CHAVE"
+                }
+              },
+              "queryRef": "Fato_Associados.CHAVE",
+              "nativeQueryRef": "CHAVE",
+              "active": false,
+              "displayName": "CHAVE"
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fato_Associados"
+                        }
+                      },
+                      "Property": "INDICE_CLASSIFICACAO"
+                    }
+                  },
+                  "Function": 1
+                }
+              },
+              "queryRef": "Sum(Fato_Associados.INDICE_CLASSIFICACAO)",
+              "nativeQueryRef": "Score Utilização",
+              "displayName": "Score Utilização"
+            }
+          ]
+        }
+      }
+    },
+    "expansionStates": [
+      {
+        "roles": [
+          "Rows"
+        ],
+        "levels": [
+          {
+            "queryRefs": [
+              "Dim_FaixaRenda.DESCRICAO"
+            ],
+            "isCollapsed": true,
+            "identityKeys": [
+              {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_FaixaRenda"
+                    }
+                  },
+                  "Property": "DESCRICAO"
+                }
+              }
+            ],
+            "isPinned": true
+          },
+          {
+            "queryRefs": [
+              "Fato_Associados.CHAVE"
+            ],
+            "isCollapsed": true,
+            "isPinned": true
+          }
+        ],
+        "root": {}
+      }
+    ],
+    "objects": {
+      "subTotals": [
+        {
+          "properties": {
+            "columnSubtotals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "rowSubtotals": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Matriz de Renda vs. Score de Utilização de Produtos'"
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI'', wf_segoe-ui_normal, helvetica, arial, sans-serif'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "18D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "2d218e44102b0709e470",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim_FaixaRenda"
+              }
+            },
+            "Property": "DESCRICAO"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "457ad167350b3ebfd920",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim_Classificação"
+              }
+            },
+            "Property": "DESCRICAO"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "c9739470645e85e021ec",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Fato_Associados"
+              }
+            },
+            "Property": "CHAVE"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "e0b2ec9f78533e820ea9",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Fato_Associados"
+                  }
+                },
+                "Property": "INDICE_CLASSIFICACAO"
+              }
+            },
+            "Function": 1
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}
