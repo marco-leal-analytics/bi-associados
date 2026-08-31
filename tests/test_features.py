@@ -14,16 +14,23 @@ from src.config.settings import (
     DIM_FAIXA_RENDA,
     DIM_NIVEL_DIVERSIFICACAO,
     DIM_NIVEL_MOVIMENTACAO,
+    DIM_TEMPO_RELACIONAMENTO,
     FAIXA_RENDA_NAO_INFORMADO_ID,
     FAIXAS_DIVERSIFICACAO,
     FAIXAS_RENDA,
+    FAIXAS_TEMPO_RELACIONAMENTO,
     KEY_COLUMN,
     OPORTUNIDADE_ALTA_RENDA_POUCOS_PRODUTOS,
     OPORTUNIDADE_BAIXA_UTILIZACAO,
     OPORTUNIDADE_POTENCIAL_CRESCIMENTO,
+    TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID,
     TERCIS_MOVIMENTACAO,
 )
-from src.features.associados import add_faixa_renda, add_indicadores_relacionamento
+from src.features.associados import (
+    add_faixa_renda,
+    add_faixa_tempo_relacionamento,
+    add_indicadores_relacionamento,
+)
 from src.features.consolidado import build_dashboard_features, build_features
 from src.features.dimensoes import build_dim_agencia, build_dimensions
 from src.features.movimentacao import IDS_NIVEL_MOVIMENTACAO
@@ -50,6 +57,13 @@ def associados_faixa_renda():
     """Silver de Associados com FAIXA_RENDA_ID adicionada."""
     df = pd.read_parquet(SILVER_ASSOCIADOS_PATH)
     return add_faixa_renda(df)
+
+
+@pytest.fixture(scope="module")
+def associados_faixa_tempo_relacionamento():
+    """Silver de Associados com TEMPO_RELACIONAMENTO_ANOS e _FAIXA_ID adicionadas."""
+    df = pd.read_parquet(SILVER_ASSOCIADOS_PATH)
+    return add_faixa_tempo_relacionamento(add_indicadores_relacionamento(df))
 
 
 @pytest.fixture(scope="module")
@@ -138,6 +152,37 @@ def test_faixa_renda_id_limites_consistentes(associados_faixa_renda):
         limite_anterior = maximo if maximo is not None else limite_anterior
 
 
+# --- Faixa de tempo de relacionamento ---
+
+
+def test_faixa_tempo_relacionamento_id_dominio(associados_faixa_tempo_relacionamento):
+    esperado = {id_ for id_, _, _ in FAIXAS_TEMPO_RELACIONAMENTO} | {TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID}
+    assert set(associados_faixa_tempo_relacionamento["TEMPO_RELACIONAMENTO_FAIXA_ID"].dropna().unique()) == esperado
+
+
+def test_faixa_tempo_relacionamento_id_nao_disponivel_em_data_invalida(associados_faixa_tempo_relacionamento):
+    invalida = associados_faixa_tempo_relacionamento["DATA_ASSOCIACAO_INVALIDA"]
+    faixa = associados_faixa_tempo_relacionamento["TEMPO_RELACIONAMENTO_FAIXA_ID"]
+    assert (faixa[invalida] == TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID).all()
+    assert (faixa[~invalida] != TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID).all()
+
+
+def test_faixa_tempo_relacionamento_id_limites_consistentes(associados_faixa_tempo_relacionamento):
+    limite_anterior_meses = 0
+    for id_, _, maximo_meses in FAIXAS_TEMPO_RELACIONAMENTO:
+        meses = (
+            associados_faixa_tempo_relacionamento.loc[
+                associados_faixa_tempo_relacionamento["TEMPO_RELACIONAMENTO_FAIXA_ID"] == id_,
+                "TEMPO_RELACIONAMENTO_ANOS",
+            ]
+            * 12
+        )
+        assert (meses > limite_anterior_meses).all()
+        if maximo_meses is not None:
+            assert (meses <= maximo_meses).all()
+        limite_anterior_meses = maximo_meses if maximo_meses is not None else limite_anterior_meses
+
+
 # --- Consolidação de features ---
 
 
@@ -153,6 +198,7 @@ def test_features_consolidadas_contem_indicadores_das_tres_entidades(features_co
         "NIVEL_DIVERSIFICACAO_ID",
         "TEMPO_RELACIONAMENTO_DIAS",
         "TEMPO_RELACIONAMENTO_ANOS",
+        "TEMPO_RELACIONAMENTO_FAIXA_ID",
         "FAIXA_RENDA_ID",
         "SALDO_MEDIO",
         "PIX_MENSAL",
@@ -261,6 +307,7 @@ def test_flags_oportunidade_sao_booleanas(features_consolidadas):
 def test_dimensoes_nomes_esperados(dimensoes):
     assert set(dimensoes.keys()) == {
         "faixa_renda",
+        "tempo_relacionamento",
         "nivel_diversificacao",
         "nivel_movimentacao",
         "classificacao",
@@ -277,6 +324,12 @@ def test_dimensoes_schema_e_chave_unica(dimensoes):
 def test_dimensao_faixa_renda_bate_com_settings(dimensoes):
     esperado = {id_: descricao for id_, descricao in DIM_FAIXA_RENDA}
     obtido = dict(zip(dimensoes["faixa_renda"]["ID"], dimensoes["faixa_renda"]["DESCRICAO"]))
+    assert obtido == esperado
+
+
+def test_dimensao_tempo_relacionamento_bate_com_settings(dimensoes):
+    esperado = {id_: descricao for id_, descricao in DIM_TEMPO_RELACIONAMENTO}
+    obtido = dict(zip(dimensoes["tempo_relacionamento"]["ID"], dimensoes["tempo_relacionamento"]["DESCRICAO"]))
     assert obtido == esperado
 
 
@@ -341,6 +394,9 @@ def test_dashboard_features_valores_batem_com_a_fato_completa(features_consolida
 def test_ids_da_fato_existem_nas_dimensoes(features_consolidadas, dimensoes):
     """Integridade referencial: todo ID gravado na fato deve existir na dimensão correspondente."""
     assert set(features_consolidadas["FAIXA_RENDA_ID"].unique()) <= set(dimensoes["faixa_renda"]["ID"])
+    assert set(features_consolidadas["TEMPO_RELACIONAMENTO_FAIXA_ID"].unique()) <= set(
+        dimensoes["tempo_relacionamento"]["ID"]
+    )
     assert set(features_consolidadas["NIVEL_DIVERSIFICACAO_ID"].unique()) <= set(
         dimensoes["nivel_diversificacao"]["ID"]
     )

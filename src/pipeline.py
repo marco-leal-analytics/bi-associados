@@ -34,6 +34,7 @@ GOLD_FEATURES_PATH = GOLD_DIR / "features.parquet"
 GOLD_FEATURES_DASHBOARD_PATH = GOLD_DIR / "features_dashboard.parquet"
 GOLD_DIM_PATHS = {
     "faixa_renda": GOLD_DIR / "dim_faixa_renda.parquet",
+    "tempo_relacionamento": GOLD_DIR / "dim_tempo_relacionamento.parquet",
     "nivel_diversificacao": GOLD_DIR / "dim_nivel_diversificacao.parquet",
     "nivel_movimentacao": GOLD_DIR / "dim_nivel_movimentacao.parquet",
     "classificacao": GOLD_DIR / "dim_classificacao.parquet",

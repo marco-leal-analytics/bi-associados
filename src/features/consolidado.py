@@ -4,7 +4,11 @@ Orquestrado por `run_gold` em `src/pipeline.py`.
 """
 
 from src.config.settings import DASHBOARD_COLUMNS, KEY_COLUMN
-from src.features.associados import add_faixa_renda, add_indicadores_relacionamento
+from src.features.associados import (
+    add_faixa_renda,
+    add_faixa_tempo_relacionamento,
+    add_indicadores_relacionamento,
+)
 from src.features.classificacao import add_classificacao
 from src.features.movimentacao import add_nivel_movimentacao
 from src.features.oportunidades import add_flags_oportunidade
@@ -41,8 +45,8 @@ def build_features(associados, produtos, movimentacao, reference_date=None):
         originais das três entidades mais todos os indicadores derivados
         e `CLASSIFICACAO_ID`/`FLAG_OPORTUNIDADE_*`. As faixas/classes
         derivadas ficam como ID inteiro (`FAIXA_RENDA_ID`,
-        `NIVEL_DIVERSIFICACAO_ID`, `NIVEL_MOVIMENTACAO_ID`,
-        `CLASSIFICACAO_ID`) — o rótulo de cada uma vive nas tabelas de
+        `TEMPO_RELACIONAMENTO_FAIXA_ID`, `NIVEL_DIVERSIFICACAO_ID`,
+        `NIVEL_MOVIMENTACAO_ID`, `CLASSIFICACAO_ID`) — o rótulo de cada uma vive nas tabelas de
         dimensão (`src/features/dimensoes.py`, `build_dimensions`),
         persistidas separadamente por `run_gold` (`src/pipeline.py`).
 
@@ -50,7 +54,8 @@ def build_features(associados, produtos, movimentacao, reference_date=None):
         pandas.errors.MergeError: Se a cardinalidade 1:1:1 pela `CHAVE`
             for violada em algum dos dois merges.
     """
-    associados = add_faixa_renda(add_indicadores_relacionamento(associados, reference_date))
+    associados = add_indicadores_relacionamento(associados, reference_date)
+    associados = add_faixa_tempo_relacionamento(add_faixa_renda(associados))
     produtos = add_indicadores_produtos(produtos)
 
     df = associados.merge(produtos, on=KEY_COLUMN, how="inner", validate="one_to_one")

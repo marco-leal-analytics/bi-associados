@@ -84,6 +84,35 @@ FAIXAS_RENDA = (
     (3, 15_000, None),
 )
 
+# Faixas de TEMPO_RELACIONAMENTO_ANOS, em semestres (6 em 6 meses): (ID,
+# limite inferior exclusivo, limite superior inclusivo), ambos em meses. Ver
+# src/features/associados.py (add_faixa_tempo_relacionamento). MAX_SEMESTRES
+# = 18 cobre até 9 anos (108 meses) — folga sobre o máximo observado na base
+# atual (~8,7 anos, ver docs/qualidade_dados.md) sem gerar faixas vazias em
+# excesso; o último semestre fica aberto ("Acima de X meses") para não
+# quebrar se a base for regenerada com tempos de relacionamento maiores,
+# mesmo racional de CALENDARIO_ANOS_BUFFER para a Dim_Calendario.
+TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID = -1
+_MESES_POR_SEMESTRE = 6
+_MAX_SEMESTRES = 18
+
+FAIXAS_TEMPO_RELACIONAMENTO = tuple(
+    (
+        i,
+        i * _MESES_POR_SEMESTRE,
+        (i + 1) * _MESES_POR_SEMESTRE if i < _MAX_SEMESTRES - 1 else None,
+    )
+    for i in range(_MAX_SEMESTRES)
+)
+
+DIM_TEMPO_RELACIONAMENTO = tuple(
+    (
+        id_,
+        f"{minimo} a {maximo} meses" if maximo is not None else f"Acima de {minimo} meses",
+    )
+    for id_, minimo, maximo in FAIXAS_TEMPO_RELACIONAMENTO
+) + ((TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID, "Não disponível"),)
+
 DIM_NIVEL_DIVERSIFICACAO = (
     (0, "Baixa"),
     (1, "Média"),
@@ -199,6 +228,7 @@ DASHBOARD_COLUMNS = (
     "QTD_PRODUTOS",  # Página 1 — Produtos por Associado
     "DATA_ASSOCIACAO",  # Página 2 — FK para dim_calendario (associados por ano/mês de entrada)
     "TEMPO_RELACIONAMENTO_ANOS",  # Página 2 — Tempo de Relacionamento
+    "TEMPO_RELACIONAMENTO_FAIXA_ID",  # Página 2 — FK para dim_tempo_relacionamento
     "DATA_ASSOCIACAO_INVALIDA",  # Nota de rodapé: exclusões de tempo de relacionamento (docs/insights.md)
     "CLASSIFICACAO_ID",  # Página 3 — FK para dim_classificacao
     "CLASSIFICACAO_TEMPO_INDISPONIVEL",  # Transparência: score de relacionamento neutralizado

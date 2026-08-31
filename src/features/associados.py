@@ -5,7 +5,13 @@ dimensão `DIM_FAIXA_RENDA` (`src/config/settings.py`).
 
 import pandas as pd
 
-from src.config.settings import DIAS_POR_ANO, FAIXA_RENDA_NAO_INFORMADO_ID, FAIXAS_RENDA
+from src.config.settings import (
+    DIAS_POR_ANO,
+    FAIXA_RENDA_NAO_INFORMADO_ID,
+    FAIXAS_RENDA,
+    FAIXAS_TEMPO_RELACIONAMENTO,
+    TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID,
+)
 
 
 def add_indicadores_relacionamento(df, reference_date=None):
@@ -67,5 +73,35 @@ def add_faixa_renda(df):
     df["FAIXA_RENDA_ID"] = faixa.cat.add_categories([FAIXA_RENDA_NAO_INFORMADO_ID]).fillna(
         FAIXA_RENDA_NAO_INFORMADO_ID
     ).astype("int64")
+
+    return df
+
+
+def add_faixa_tempo_relacionamento(df):
+    """Classifica `TEMPO_RELACIONAMENTO_ANOS` em semestres (`FAIXAS_TEMPO_RELACIONAMENTO`), como ID.
+
+    Registros com `TEMPO_RELACIONAMENTO_ANOS` nulo (associados com
+    `DATA_ASSOCIACAO_INVALIDA`, ver `add_indicadores_relacionamento`)
+    recebem `TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID`, mesmo tratamento de
+    `add_faixa_renda` para nulos. O rótulo de cada ID vive em
+    `DIM_TEMPO_RELACIONAMENTO` (`src/config/settings.py`), não nesta coluna.
+
+    Args:
+        df: `DataFrame` com a coluna `TEMPO_RELACIONAMENTO_ANOS` (anos,
+            já calculada por `add_indicadores_relacionamento`).
+
+    Returns:
+        Cópia de `df` com `TEMPO_RELACIONAMENTO_FAIXA_ID` (int) adicionada.
+    """
+    df = df.copy()
+
+    ids, _, maximos = zip(*FAIXAS_TEMPO_RELACIONAMENTO)
+    bins_meses = [0, *maximos[:-1], float("inf")]
+
+    meses = df["TEMPO_RELACIONAMENTO_ANOS"] * 12
+    faixa = pd.cut(meses, bins=bins_meses, labels=ids, include_lowest=True)
+    df["TEMPO_RELACIONAMENTO_FAIXA_ID"] = faixa.cat.add_categories(
+        [TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID]
+    ).fillna(TEMPO_RELACIONAMENTO_NAO_DISPONIVEL_ID).astype("int64")
 
     return df

@@ -12,6 +12,7 @@ from src.config.settings import (
     DIM_FAIXA_RENDA,
     DIM_NIVEL_DIVERSIFICACAO,
     DIM_NIVEL_MOVIMENTACAO,
+    DIM_TEMPO_RELACIONAMENTO,
 )
 
 ID_COLUMN = "ID"
@@ -36,17 +37,18 @@ def _build_dim(pairs):
 
 
 def build_dimensions():
-    """Monta as quatro tabelas de dimensão usadas pela Gold.
+    """Monta as cinco tabelas de dimensão ID -> descrição usadas pela Gold.
 
     Returns:
         Dicionário `{nome_da_dimensao: DataFrame}`, com as chaves
-        `faixa_renda`, `nivel_diversificacao`, `nivel_movimentacao` e
-        `classificacao` — mesmos nomes usados nos arquivos
-        `data/2_gold/dim_{nome}.parquet` (ver `run_gold`,
+        `faixa_renda`, `tempo_relacionamento`, `nivel_diversificacao`,
+        `nivel_movimentacao` e `classificacao` — mesmos nomes usados nos
+        arquivos `data/2_gold/dim_{nome}.parquet` (ver `run_gold`,
         `src/pipeline.py`).
     """
     return {
         "faixa_renda": _build_dim(DIM_FAIXA_RENDA),
+        "tempo_relacionamento": _build_dim(DIM_TEMPO_RELACIONAMENTO),
         "nivel_diversificacao": _build_dim(DIM_NIVEL_DIVERSIFICACAO),
         "nivel_movimentacao": _build_dim(DIM_NIVEL_MOVIMENTACAO),
         "classificacao": _build_dim(DIM_CLASSIFICACAO),

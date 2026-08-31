@@ -21,7 +21,7 @@ Informações cadastrais do associado.
 |---|---|---|---|---|---|
 | CHAVE | int64 | int64 | Identificador único do associado | 1 a 1000 | Sem nulos, sem duplicidade |
 | NOME | string | string | Nome do associado | "Fernanda Sobrenome" | Apenas 10 nomes distintos para 1000 registros (Interpretação: Coluna criada de forma ficticia: Avaliar em base de dados reais) |
-| AGENCIA | int64 | category/int | Código da agência de relacionamento | {1, 2, 3, 4, 5} | Sem nome de agência na fonte; tratar como código categórico. Nome de negócio (levantamento) disponível em `dim_agencia` (seção 6.6) |
+| AGENCIA | int64 | category/int | Código da agência de relacionamento | {1, 2, 3, 4, 5} | Sem nome de agência na fonte; tratar como código categórico. Nome de negócio (levantamento) disponível em `dim_agencia` (seção 6.7) |
 | CIDADE | string | category (padronizada) | Cidade do associado | "Pato Branco", "Cascavel", "Chapecó", "Toledo", "Maringá" | **Inconsistência de categoria**: mesma cidade grafada de 3 formas — "Pato Branco", "P. Branco", "PATO BRANCO" — e "Chapeco" sem acentuação. Ver regra de padronização em `qualidade_dados.md` |
 | DATA_ASSOCIACAO | datetime | datetime (date) | Data de entrada do associado na cooperativa/instituição | 2018-01-02 a 2026-12-26 | **37 registros com data futura** em relação à data de referência do pipeline — inválido para cálculo de tempo de relacionamento |
 | RENDA_MENSAL | float64 | float64 | Renda mensal declarada | R$ 2.010 a R$ 29.972 | **12 registros nulos (1,2%)** |
@@ -93,6 +93,7 @@ Gerados por `run_silver()` (`src/pipeline.py`), que aplica `clean_associados`/`c
 | TEMPO_RELACIONAMENTO_DIAS | DATA_REFERENCIA − DATA_ASSOCIACAO | Int64 (nulo se DATA_ASSOCIACAO_INVALIDA) | Dias desde a associação |
 | TEMPO_RELACIONAMENTO_ANOS | TEMPO_RELACIONAMENTO_DIAS / 365,25 | Float64 (nulo se DATA_ASSOCIACAO_INVALIDA) | Anos de relacionamento, arredondado a 2 casas |
 | FAIXA_RENDA_ID | Faixa de RENDA_MENSAL (`FAIXAS_RENDA`) | int64 (0–3 ou -1) | FK para `dim_faixa_renda` (seção 6.1); -1 quando RENDA_MENSAL é nula ("Não informado") |
+| TEMPO_RELACIONAMENTO_FAIXA_ID | Faixa semestral (6 em 6 meses) de TEMPO_RELACIONAMENTO_ANOS (`FAIXAS_TEMPO_RELACIONAMENTO`) | int64 (0–17 ou -1) | FK para `dim_tempo_relacionamento` (seção 6.2); -1 quando TEMPO_RELACIONAMENTO_ANOS é nulo ("Não disponível", mesmos 37 registros de DATA_ASSOCIACAO_INVALIDA) |
 
 ### 5.3 Nível de movimentação (`src/features/movimentacao.py`)
 
@@ -128,7 +129,7 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 
 ### 5.6 Tabela reduzida para o Power BI (`features_dashboard.parquet`)
 
-`data/2_gold/features_dashboard.parquet`: projeção de `features.parquet` (seção 5) só com as colunas que alimentam algum visual das 4 páginas do dashboard (`regras_negocio.md`, seção 7), gerada por `build_dashboard_features` (`src/features/consolidado.py`) a partir de `DASHBOARD_COLUMNS` (`src/config/settings.py`) e persistida por `run_gold` (`src/pipeline.py`). 1000 linhas × 15 colunas, contra 40 colunas da fato completa — os campos deixados de fora são todos intermediários de cálculo (pilares `SCORE_*`, níveis individuais de movimentação, `INDICE_*`, colunas de produto por tipo, flags `*_INVALIDO` de qualidade) que já foram consumidos para produzir `CLASSIFICACAO_ID`/`FLAG_OPORTUNIDADE_*` e não têm visual próprio no desafio. Esta é a tabela recomendada para o import no Power BI (junto das quatro dimensões `dim_*_id` e da `dim_calendario`, seção 6); `features.parquet` continua disponível como fato completa/auditável.
+`data/2_gold/features_dashboard.parquet`: projeção de `features.parquet` (seção 5) só com as colunas que alimentam algum visual das 4 páginas do dashboard (`regras_negocio.md`, seção 7), gerada por `build_dashboard_features` (`src/features/consolidado.py`) a partir de `DASHBOARD_COLUMNS` (`src/config/settings.py`) e persistida por `run_gold` (`src/pipeline.py`). 1000 linhas × 16 colunas, contra 41 colunas da fato completa — os campos deixados de fora são todos intermediários de cálculo (pilares `SCORE_*`, níveis individuais de movimentação, `INDICE_*`, colunas de produto por tipo, flags `*_INVALIDO` de qualidade) que já foram consumidos para produzir `CLASSIFICACAO_ID`/`FLAG_OPORTUNIDADE_*` e não têm visual próprio no desafio. Esta é a tabela recomendada para o import no Power BI (junto das cinco dimensões `dim_*_id`, da `dim_calendario` e da `dim_agencia`, seção 6); `features.parquet` continua disponível como fato completa/auditável.
 
 | Coluna | Página que usa | Papel |
 |---|---|---|
@@ -141,6 +142,7 @@ Não são mutuamente exclusivas — ver `regras_negocio.md` (seção 6).
 | QTD_PRODUTOS | Página 1 | Produtos por Associado |
 | DATA_ASSOCIACAO | Página 2 | FK para `dim_calendario` (associados por ano/mês de entrada) |
 | TEMPO_RELACIONAMENTO_ANOS | Página 2 | Tempo de Relacionamento |
+| TEMPO_RELACIONAMENTO_FAIXA_ID | Página 2 | FK para `dim_tempo_relacionamento` |
 | DATA_ASSOCIACAO_INVALIDA | Todas (nota de rodapé) | Sinaliza os 37 registros excluídos do cálculo de tempo — ver `insights.md` |
 | CLASSIFICACAO_ID | Página 3 | FK para `dim_classificacao` |
 | CLASSIFICACAO_TEMPO_INDISPONIVEL | Página 3 (transparência) | Sinaliza score de relacionamento neutralizado |
@@ -162,7 +164,33 @@ Tabelas auxiliares de de-para ID → descrição, construídas por `build_dimens
 | 3 | Acima de R$ 15.000 |
 | -1 | Não informado |
 
-### 6.2 `dim_nivel_diversificacao.parquet`
+### 6.2 `dim_tempo_relacionamento.parquet`
+
+Faixas semestrais (6 em 6 meses) de `TEMPO_RELACIONAMENTO_ANOS`, cobrindo até 9 anos (108 meses) — folga sobre o máximo observado na base atual (~8,7 anos). Fonte de verdade: `DIM_TEMPO_RELACIONAMENTO`/`FAIXAS_TEMPO_RELACIONAMENTO` (`src/config/settings.py`). Calculada por `add_faixa_tempo_relacionamento` (`src/features/associados.py`) a partir de `TEMPO_RELACIONAMENTO_ANOS` já em meses.
+
+| ID | DESCRICAO |
+|---|---|
+| 0 | 0 a 6 meses |
+| 1 | 6 a 12 meses |
+| 2 | 12 a 18 meses |
+| 3 | 18 a 24 meses |
+| 4 | 24 a 30 meses |
+| 5 | 30 a 36 meses |
+| 6 | 36 a 42 meses |
+| 7 | 42 a 48 meses |
+| 8 | 48 a 54 meses |
+| 9 | 54 a 60 meses |
+| 10 | 60 a 66 meses |
+| 11 | 66 a 72 meses |
+| 12 | 72 a 78 meses |
+| 13 | 78 a 84 meses |
+| 14 | 84 a 90 meses |
+| 15 | 90 a 96 meses |
+| 16 | 96 a 102 meses |
+| 17 | Acima de 102 meses |
+| -1 | Não disponível |
+
+### 6.3 `dim_nivel_diversificacao.parquet`
 
 | ID | DESCRICAO |
 |---|---|
@@ -170,7 +198,7 @@ Tabelas auxiliares de de-para ID → descrição, construídas por `build_dimens
 | 1 | Média |
 | 2 | Alta |
 
-### 6.3 `dim_nivel_movimentacao.parquet`
+### 6.4 `dim_nivel_movimentacao.parquet`
 
 Compartilhada por `NIVEL_SALDO_MEDIO_ID`, `NIVEL_PIX_MENSAL_ID`, `NIVEL_COMPRAS_CARTAO_ID` e `NIVEL_MOVIMENTACAO_ID` (seção 5.3) — mesmo domínio.
 
@@ -180,7 +208,7 @@ Compartilhada por `NIVEL_SALDO_MEDIO_ID`, `NIVEL_PIX_MENSAL_ID`, `NIVEL_COMPRAS_
 | 1 | Média |
 | 2 | Alta |
 
-### 6.4 `dim_classificacao.parquet`
+### 6.5 `dim_classificacao.parquet`
 
 | ID | DESCRICAO |
 |---|---|
@@ -189,9 +217,9 @@ Compartilhada por `NIVEL_SALDO_MEDIO_ID`, `NIVEL_PIX_MENSAL_ID`, `NIVEL_COMPRAS_
 | 2 | Maduro |
 | 3 | Engajado |
 
-A ordem crescente do ID já reflete a ordem de negócio (pior → melhor) em todas as quatro dimensões — útil para ordenar eixos/legendas no Power BI sem depender de texto.
+A ordem crescente do ID já reflete a ordem de negócio (pior → melhor, ou mais curto → mais longo em `dim_tempo_relacionamento`) em todas as cinco dimensões desta seção — útil para ordenar eixos/legendas no Power BI sem depender de texto.
 
-### 6.5 `dim_calendario.parquet`
+### 6.6 `dim_calendario.parquet`
 
 Única dimensão da Gold que não vem de `DIM_*` (`src/config/settings.py`) nem de cálculo sobre os dados dos associados: é a projeção de uma fonte externa bruta, `data/0_bronze/raw_Dim_Calendario.xlsx` (aba `Dim_Calendario`, 45 colunas, ~28.850 linhas, anos 2000–2078, mais uma aba `Dim_Feriado` não utilizada neste projeto).
 
@@ -215,7 +243,7 @@ A ordem crescente do ID já reflete a ordem de negócio (pior → melhor) em tod
 
 Diferente das quatro dimensões acima (FK por `*_ID` inteiro), o relacionamento desta dimensão com a fato é por data (`DATA` ↔ `DATA_ASSOCIACAO`), padrão usual de tabela calendário no Power BI.
 
-### 6.6 `dim_agencia.parquet`
+### 6.7 `dim_agencia.parquet`
 
 A Bronze traz só o código da agência (`AGENCIA`, seção 1) — `{1, 2, 3, 4, 5}`, sem nome associado. Diferente das dimensões 6.1–6.4 (calculadas sobre os próprios dados), esta é levantamento de negócio: nomes reais de agências da cooperativa **Sicredi Soma** (contexto do desafio — sede administrativa em Mariópolis-PR, atuação em 33 municípios do sudoeste do Paraná e oeste/meio-oeste de Santa Catarina, ~43 agências ao todo; pesquisa pública no site institucional, ago/2026).
 
