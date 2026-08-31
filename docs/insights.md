@@ -53,6 +53,11 @@ Cada achado é documentado com:
 
 ## Página 4 — Oportunidades
 
+**Achado**: cruzando Faixa de Renda (linhas) × Classificação (colunas) numa matriz, com `INDICE_CLASSIFICACAO` médio como valor, o score sobe de forma consistente da esquerda para a direita (Inicial → Engajado, ~0,33 a ~0,67) mas varia pouco entre faixas de renda dentro de uma mesma coluna — ou seja, o score de utilização é explicado quase inteiramente pela classificação, não pela renda. Isso torna visível o quadrante de maior oportunidade: **"Acima de R$ 15.000" × "Inicial" — 133 associados (13,3% da base), score médio 0,33**, o mais baixo de toda a faixa de renda mais alta.
+**Evidência**: matriz Renda × Classificação (Página 4), valor = média de `INDICE_CLASSIFICACAO`; célula "Acima de R$ 15.000" × "Inicial" isolada sobre `features.parquet`.
+**Implicação de negócio**: substitui a lógica de listas fixas por um ranking contínuo — em vez de decidir a priori os critérios de corte (ex.: "renda > R$15.000 E produtos ≤ 2"), a matriz deixa visível *onde* a combinação renda-alta/score-baixo é mais concentrada, e a tabela detalhada (ordenada de forma ascendente por `INDICE_CLASSIFICACAO`) já entrega os associados priorizados dentro dessa célula, com os cinco pilares `SCORE_*` como diagnóstico de composição (qual pilar está puxando o score para baixo).
+**Ação sugerida**: usar a célula "Acima de R$ 15.000" × "Inicial" como primeira lista de trabalho da área comercial — é o mesmo público de maior potencial de receita incremental identificado abaixo ("Alta renda e poucos produtos"), agora com um mecanismo de exploração interativo (clicar na célula da matriz filtra a tabela) em vez de uma lista estática.
+
 **Achado**: **538 associados (53,8%)** aparecem em pelo menos uma das três listas de oportunidade — mais da metade da carteira tem uma ação comercial objetivamente identificável.
 **Evidência**: `FLAG_OPORTUNIDADE_*` (Página 4), união das três flags.
 **Implicação de negócio**: o volume de oportunidades acionáveis é grande o suficiente para justificar uma rotina periódica de acompanhamento comercial dedicada a esta página, não um relatório eventual.
